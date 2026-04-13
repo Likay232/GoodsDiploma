@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodsApi", "GoodsApi\GoodsApi.csproj", "{A52B94AC-9254-4D51-A653-03C957C7783A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodsApi.Infrastructure", "GoodsApi.Infrastructure\GoodsApi.Infrastructure.csproj", "{BC941BE3-BF18-41E3-B0E6-02F1365DF755}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A52B94AC-9254-4D51-A653-03C957C7783A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A52B94AC-9254-4D51-A653-03C957C7783A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A52B94AC-9254-4D51-A653-03C957C7783A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A52B94AC-9254-4D51-A653-03C957C7783A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC941BE3-BF18-41E3-B0E6-02F1365DF755}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC941BE3-BF18-41E3-B0E6-02F1365DF755}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC941BE3-BF18-41E3-B0E6-02F1365DF755}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC941BE3-BF18-41E3-B0E6-02F1365DF755}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

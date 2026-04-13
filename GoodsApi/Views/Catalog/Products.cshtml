@@ -1,0 +1,511 @@
+@model GoodsApi.Infrastructure.ViewModels.ProductsViewModel
+
+@{
+    ViewBag.Title = "Каталог товаров";
+    Layout = "_Layout";
+}
+
+<head>
+    <style>
+        .products-page {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .products-header-left h2 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .products-header-left p {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .products-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .products-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 16px;
+            border-radius: 14px;
+            background: #f3f4f6;
+            color: #111827;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #e5e7eb;
+        }
+
+        .add-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 170px;
+            height: 44px;
+            padding: 0 18px;
+            border-radius: 14px;
+            background: #111827;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.18s ease;
+            box-shadow: 0 10px 22px rgba(17, 24, 39, 0.14);
+        }
+
+        .add-btn:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(17, 24, 39, 0.20);
+        }
+
+        .add-btn img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 22px;
+        }
+
+        .product-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-height: 310px;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.07);
+            border-color: #d1d5db;
+        }
+
+        .product-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .product-title-block {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .product-name {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.25;
+            word-break: break-word;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .product-id {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .product-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .info-block {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: #f9fafb;
+            border: 1px solid #f3f4f6;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+
+        .minimum-remain {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #dbeafe;
+        }
+
+        .product-actions {
+            margin-top: auto;
+            padding-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .details-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 130px;
+            height: 44px;
+            padding: 0 18px;
+            border-radius: 14px;
+            background: #111827;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.18s ease;
+            box-shadow: 0 10px 22px rgba(17, 24, 39, 0.14);
+        }
+
+        .details-btn:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(17, 24, 39, 0.20);
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.18s ease;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            border-color: #d1d5db;
+            background: #f9fafb;
+        }
+
+        .icon-btn img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        .delete-btn {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .delete-btn:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        .delete-form {
+            margin: 0;
+        }
+
+        .empty-state {
+            margin-top: 24px;
+            padding: 48px 28px;
+            border-radius: 28px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .empty-state h3 {
+            margin: 0 0 12px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 220px;
+            height: 44px;
+            padding: 0 16px;
+            border-radius: 14px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+            font-weight: 400;
+            outline: none;
+        }
+
+        .search-btn {
+            height: 44px;
+            padding: 0 18px;
+            border-radius: 14px;
+            border: none;
+            background: #111827;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .search-btn:hover {
+            background: #1f2937;
+        }
+
+        @@media (max-width: 768px) {
+            .products-page {
+                margin: 24px auto;
+                padding: 0 14px;
+            }
+
+            .products-header-left h2 {
+                font-size: 28px;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .product-card {
+                padding: 20px;
+                border-radius: 20px;
+                min-height: auto;
+            }
+
+            .product-name {
+                font-size: 20px;
+            }
+
+            .product-title-block {
+                align-items: flex-start;
+            }
+
+            .product-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .details-btn {
+                width: 100%;
+            }
+
+            .admin-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .products-header-right {
+                width: 100%;
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<div class="products-page">
+
+    <div class="products-header">
+        <div class="products-header-left">
+            <h2>Каталог товаров</h2>
+            <p>Просмотр всех товарных позиций, категорий, брендов и минимальных остатков.</p>
+        </div>
+
+        <div class="products-header-right">
+            <div class="products-count">
+                Всего товаров: @Model.Products.Count
+            </div>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Catalog"
+                   asp-action="ProductEditPage"
+                   class="add-btn">
+                    <img src="~/images/add.svg" alt="Добавить" />
+                    <span>Добавить товар</span>
+                </a>
+            }
+        </div>
+    </div>
+
+    <form method="get" asp-action="Products" class="search-form">
+        <input type="text"
+               name="query"
+               value="@Model.SearchQuery"
+               placeholder="Поиск по артикулу, размеру или цвету..."
+               class="search-input" />
+        <button type="submit" class="search-btn">Найти</button>
+    </form>
+
+    @if (Model.Products.Any())
+    {
+        <div class="products-grid">
+            @foreach (var product in Model.Products)
+            {
+                <div class="product-card">
+                    <div class="product-top">
+                        <div class="product-title-block">
+                            <h3 class="product-name">@product.Name</h3>
+                            <span class="product-id">ID: @product.Id</span>
+                        </div>
+                    </div>
+
+                    <div class="product-info">
+                        <div class="info-block">
+                            <div class="info-label">Категория</div>
+                            <div class="info-value">@product.Category</div>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-label">Бренд</div>
+                            <div class="info-value">@product.Brand</div>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-label">Минимальный остаток</div>
+                            <div class="info-value">
+                                <span class="minimum-remain">@product.MinimumRemain</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-actions">
+                        <a asp-controller="Catalog"
+                           asp-action="ProductInfos"
+                           asp-route-productId="@product.Id"
+                           class="details-btn">
+                            Подробнее
+                        </a>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="admin-actions">
+                                <a asp-controller="Catalog"
+                                   asp-action="ProductEditPage"
+                                   asp-route-productId="@product.Id"
+                                   class="icon-btn"
+                                   title="Редактировать">
+                                    <img src="~/images/edit.svg" alt="Редактировать" />
+                                </a>
+
+                                <form asp-controller="Catalog"
+                                      asp-action="DeleteProduct"
+                                      asp-route-productId="@product.Id"
+                                      method="post"
+                                      class="delete-form"
+                                      onsubmit="return confirm('Удалить товар и связанные с ним реализации?');">
+                                    <button type="submit"
+                                            class="icon-btn delete-btn"
+                                            title="Удалить">
+                                        <img src="~/images/delete.svg" alt="Удалить" />
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <h3>Товары не найдены</h3>
+            <p>
+                Проверьте правильность запроса или добавьте товары в каталог.
+            </p>
+        </div>
+    }
+</div>

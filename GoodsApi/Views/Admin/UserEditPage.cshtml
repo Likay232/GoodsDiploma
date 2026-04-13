@@ -1,0 +1,517 @@
+@model GoodsApi.Infrastructure.ViewModels.UserEditViewModel
+
+@{
+    ViewBag.Title = Model.Id == 0 ? "Добавление пользователя" : "Редактирование пользователя";
+    Layout = "_Layout";
+    var isCreate = Model.Id == 0;
+}
+
+<head>
+    <style>
+        .user-edit-page {
+            max-width: 860px;
+            margin: 40px auto;
+            padding: 0 20px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .edit-header-left h2 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .edit-header-left p {
+            margin-top: 8px;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .back-btn,
+        .password-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            height: 46px;
+            padding: 0 18px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.18s ease;
+            border: 1px solid #e5e7eb;
+        }
+
+        .back-btn {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+
+        .password-btn {
+            background: #fff7ed;
+            color: #c2410c;
+            border-color: #fed7aa;
+        }
+
+        .password-btn:hover {
+            background: #ffedd5;
+            transform: translateY(-2px);
+        }
+
+        .edit-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .edit-form {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .section-title {
+            margin: 0 0 18px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            min-height: 50px;
+            padding: 0 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 14px;
+            font-size: 15px;
+            color: #111827;
+            background: #ffffff;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.10);
+        }
+
+        .password-input:focus {
+            border-color: #ea580c;
+            box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.10);
+        }
+
+        .form-hint {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: -2px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            background: #f9fafb;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-row label {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: #111827;
+            cursor: pointer;
+        }
+
+        .meta-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 18px;
+        }
+
+        .meta-card {
+            padding: 16px 18px;
+            border-radius: 16px;
+            background: #f9fafb;
+            border: 1px solid #f3f4f6;
+        }
+
+        .meta-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .meta-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            word-break: break-word;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            width: fit-content;
+        }
+
+        .status-active {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .status-blocked {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .warning-box {
+            padding: 16px 18px;
+            border-radius: 16px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 14px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+
+        .secondary-btn,
+        .primary-btn {
+            min-width: 160px;
+            height: 50px;
+            border-radius: 16px;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .secondary-btn {
+            background: #f3f4f6;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+        }
+
+        .secondary-btn:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+
+        .primary-btn {
+            background: #111827;
+            color: #ffffff;
+            box-shadow: 0 10px 24px rgba(17, 24, 39, 0.18);
+        }
+
+        .primary-btn:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(17, 24, 39, 0.24);
+        }
+
+        .validation-summary-errors {
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            font-size: 14px;
+        }
+
+        .field-validation-error {
+            font-size: 13px;
+            color: #b91c1c;
+            margin-top: 2px;
+        }
+
+        @@media (max-width: 768px) {
+            .user-edit-page {
+                margin: 24px auto;
+                padding: 0 14px;
+            }
+
+            .edit-header-left h2 {
+                font-size: 26px;
+            }
+
+            .edit-card {
+                padding: 22px;
+                border-radius: 20px;
+            }
+
+            .form-grid,
+            .meta-info {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions,
+            .header-actions {
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+
+            .secondary-btn,
+            .primary-btn,
+            .back-btn,
+            .password-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<div class="user-edit-page">
+    <div class="edit-header">
+        <div class="edit-header-left">
+            <h2>@(isCreate ? "Добавление пользователя" : "Редактирование пользователя")</h2>
+            <p>
+                @(isCreate
+                    ? "Создайте нового пользователя, назначьте роль и задайте пароль."
+                    : "Измените данные пользователя, его роль и статус доступа.")
+            </p>
+        </div>
+
+        <div class="header-actions">
+            @if (!isCreate)
+            {
+                <a asp-controller="Admin"
+                   asp-action="ChangeUserPasswordPage"
+                   asp-route-id="@Model.Id"
+                   class="password-btn">
+                    Сменить пароль
+                </a>
+            }
+
+            <a asp-controller="Admin"
+               asp-action="Users"
+               class="back-btn">
+                Назад
+            </a>
+        </div>
+    </div>
+
+    <div class="edit-card">
+        <form asp-controller="Admin"
+              asp-action="SaveUser"
+              method="post"
+              class="edit-form">
+
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="RegisteredAt" />
+
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div>
+                <h3 class="section-title">Основная информация</h3>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="Username" class="form-label">Имя пользователя</label>
+                        <input asp-for="Username" class="form-input" placeholder="Введите имя пользователя" />
+                        <span asp-validation-for="Username"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-input" placeholder="Введите email" />
+                        <span asp-validation-for="Email"></span>
+                    </div>
+                </div>
+            </div>
+
+            @if (isCreate)
+            {
+                <div>
+                    <h3 class="section-title">Пароль</h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label asp-for="Password" class="form-label">Пароль</label>
+                            <input asp-for="Password"
+                                   class="form-input password-input"
+                                   type="password"
+                                   placeholder="Введите пароль" />
+                            <span asp-validation-for="Password"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ConfirmPassword" class="form-label">Подтверждение пароля</label>
+                            <input asp-for="ConfirmPassword"
+                                   class="form-input password-input"
+                                   type="password"
+                                   placeholder="Повторите пароль" />
+                            <span asp-validation-for="ConfirmPassword"></span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div>
+                <h3 class="section-title">Права и доступ</h3>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="RoleId" class="form-label">Роль</label>
+                        <select asp-for="RoleId" class="form-select">
+                            <option value="">Выберите роль</option>
+                            @foreach (var role in Model.Roles)
+                            {
+                                if (role.Id == Model.RoleId)
+                                {
+                                    <option value="@role.Id" selected>@role.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@role.Id">@role.Name</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="RoleId"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Текущий статус</label>
+
+                        <div style="margin-top: 10px;">
+                            @if (Model.IsBlocked)
+                            {
+                                <span class="status-chip status-blocked">Заблокирован</span>
+                            }
+                            else
+                            {
+                                <span class="status-chip status-active">Активен</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <div class="checkbox-row">
+                            <input asp-for="IsBlocked" type="checkbox" id="isBlockedCheckbox" />
+                            <label for="isBlockedCheckbox">Заблокировать пользователя</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (!isCreate)
+            {
+                <div>
+                    <h3 class="section-title">Служебная информация</h3>
+
+                    <div class="meta-info">
+                        <div class="meta-card">
+                            <div class="meta-title">ID пользователя</div>
+                            <div class="meta-value">@Model.Id</div>
+                        </div>
+
+                        <div class="meta-card">
+                            <div class="meta-title">Дата регистрации</div>
+                            <div class="meta-value">@Model.RegisteredAt.ToString("dd.MM.yyyy HH:mm")</div>
+                        </div>
+
+                        <div class="meta-card">
+                            <div class="meta-title">Роль</div>
+                            <div class="meta-value">
+                                @(Model.Roles.FirstOrDefault(r => r.Id == Model.RoleId)?.Name ?? "Не указана")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="form-actions">
+                <a asp-controller="Admin"
+                   asp-action="Users"
+                   class="secondary-btn">
+                    Отмена
+                </a>
+
+                <button type="submit" class="primary-btn">
+                    @(isCreate ? "Создать пользователя" : "Сохранить изменения")
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

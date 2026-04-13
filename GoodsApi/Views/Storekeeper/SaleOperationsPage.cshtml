@@ -1,0 +1,418 @@
+@model GoodsApi.Infrastructure.ViewModels.SaleOperationsViewModel
+
+@{
+    ViewBag.Title = "Подтверждение отгрузок";
+    Layout = "_Layout";
+
+    var pendingCount = Model.ShipmentsForApproval.Count(x => !x.IsShipped);
+    var shippedCount = Model.ShipmentsForApproval.Count(x => x.IsShipped);
+}
+
+<head>
+    <style>
+        .shipments-page {
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 20px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .shipments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .shipments-header-left h2 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .shipments-header-left p {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .shipments-header-right {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .summary-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid transparent;
+        }
+
+        .summary-all {
+            background: #f3f4f6;
+            color: #111827;
+            border-color: #e5e7eb;
+        }
+
+        .summary-pending {
+            background: #fffbeb;
+            color: #b45309;
+            border-color: #fde68a;
+        }
+
+        .summary-shipped {
+            background: #ecfdf5;
+            color: #047857;
+            border-color: #a7f3d0;
+        }
+
+        .shipments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .shipment-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+        }
+
+        .shipment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.07);
+            border-color: #d1d5db;
+        }
+
+        .shipment-card.shipped {
+            opacity: 0.78;
+            background: #fcfcfc;
+        }
+
+        .shipment-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .shipment-title-block {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .shipment-title {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        .shipment-subtitle {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #f9fafb;
+            color: #4b5563;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+
+        .status-pending {
+            background: #fffbeb;
+            color: #b45309;
+            border-color: #fde68a;
+        }
+
+        .status-shipped {
+            background: #ecfdf5;
+            color: #047857;
+            border-color: #a7f3d0;
+        }
+
+        .shipment-info {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 26px;
+        }
+
+        .info-block {
+            padding: 16px 18px;
+            border-radius: 20px;
+            background: #f9fafb;
+            border: 1px solid #f3f4f6;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 17px;
+            font-weight: 700;
+            color: #111827;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+
+        .shipment-actions {
+            margin-top: auto;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .confirm-btn {
+            min-width: 220px;
+            height: 48px;
+            padding: 0 22px;
+            border-radius: 16px;
+            background: #111827;
+            color: #ffffff;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            box-shadow: 0 12px 24px rgba(17, 24, 39, 0.16);
+        }
+
+        .confirm-btn:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 30px rgba(17, 24, 39, 0.22);
+        }
+
+        .confirm-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .shipped-note {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 18px;
+            border-radius: 16px;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+        }
+
+        .empty-state {
+            margin-top: 24px;
+            padding: 48px 28px;
+            border-radius: 28px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .empty-state h3 {
+            margin: 0 0 12px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        @@media (max-width: 992px) {
+            .shipment-info {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .shipments-page {
+                margin: 24px auto;
+                padding: 0 14px;
+            }
+
+            .shipments-header-left h2 {
+                font-size: 28px;
+            }
+
+            .shipment-card {
+                padding: 22px 18px;
+                border-radius: 22px;
+            }
+
+            .shipment-title {
+                font-size: 24px;
+            }
+
+            .shipment-info {
+                grid-template-columns: 1fr;
+            }
+
+            .shipment-actions {
+                justify-content: stretch;
+            }
+
+            .confirm-btn,
+            .shipped-note {
+                width: 100%;
+            }
+
+            .shipments-header-right {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<div class="shipments-page">
+    <div class="shipments-header">
+        <div class="shipments-header-left">
+            <h2>Подтверждение отгрузок</h2>
+            <p>Контроль и подтверждение отгрузки товаров после оформления продаж.</p>
+        </div>
+
+        <div class="shipments-header-right">
+            <div class="summary-badge summary-all">
+                Всего операций: @Model.ShipmentsForApproval.Count
+            </div>
+            <div class="summary-badge summary-pending">
+                Ожидают: @pendingCount
+            </div>
+            <div class="summary-badge summary-shipped">
+                Отгружено: @shippedCount
+            </div>
+        </div>
+    </div>
+
+    @if (Model.ShipmentsForApproval.Any())
+    {
+        <div class="shipments-list">
+            @foreach (var shipment in Model.ShipmentsForApproval)
+            {
+                <div class="shipment-card @(shipment.IsShipped ? "shipped" : "")">
+                    <div class="shipment-top">
+                        <div class="shipment-title-block">
+                            <h3 class="shipment-title">Операция продажи #@shipment.SaleOperationId</h3>
+
+                            <div class="shipment-subtitle">
+                                <span class="meta-badge">Артикул: @shipment.Article</span>
+                                <span class="meta-badge">Размер: @shipment.Size</span>
+                                <span class="meta-badge">Цвет: @shipment.Color</span>
+                            </div>
+                        </div>
+
+                        <span class="status-badge @(shipment.IsShipped ? "status-shipped" : "status-pending")">
+                            @(shipment.IsShipped ? "Отгружено" : "Ожидает отгрузки")
+                        </span>
+                    </div>
+
+                    <div class="shipment-info">
+                        <div class="info-block">
+                            <div class="info-label">Количество</div>
+                            <div class="info-value">@shipment.Amount</div>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-label">Расположение</div>
+                            <div class="info-value">@shipment.Location</div>
+                        </div>
+                        
+                        <div class="info-block">
+                            <div class="info-label">Статус</div>
+                            <div class="info-value">
+                                @(shipment.IsShipped ? "Завершено" : "Требует подтверждения")
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shipment-actions">
+                        @if (!shipment.IsShipped)
+                        {
+                            <form asp-controller="Storekeeper"
+                                  asp-action="ConfirmShipment"
+                                  asp-route-saleOperationId="@shipment.SaleOperationId"
+                                  method="post"
+                                  onsubmit="return confirm('Подтвердить отгрузку данной продажи?');">
+                                <button type="submit" class="confirm-btn">
+                                    Подтвердить отгрузку
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="shipped-note">
+                                Отгрузка уже подтверждена
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <h3>Нет операций для отгрузки</h3>
+            <p>
+                Сейчас отсутствуют продажи, ожидающие подтверждения отгрузки.
+            </p>
+        </div>
+    }
+</div>

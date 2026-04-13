@@ -1,0 +1,292 @@
+@model GoodsApi.Infrastructure.ViewModels.ProviderEditViewModel
+
+@{
+    ViewBag.Title = Model.IsEdit ? "Редактирование поставщика" : "Добавление поставщика";
+    Layout = "_Layout";
+}
+
+<head>
+    <style>
+        .provider-edit-page {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px 40px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .provider-edit-header {
+            margin-bottom: 28px;
+        }
+
+        .provider-edit-header h2 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .provider-edit-header p {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .provider-edit-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.05);
+        }
+
+        .provider-id-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+        }
+
+        .provider-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+            letter-spacing: 0.02em;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 15px;
+            color: #111827;
+            background: #ffffff;
+            outline: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: #111827;
+            box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.06);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .field-hint {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .validation-text {
+            font-size: 13px;
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .validation-summary-errors {
+            margin-bottom: 22px;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .validation-summary-errors ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .secondary-btn,
+        .primary-btn {
+            min-width: 170px;
+            height: 48px;
+            padding: 0 22px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.18s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .secondary-btn {
+            background: #f3f4f6;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+        }
+
+        .secondary-btn:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+
+        .primary-btn {
+            background: #111827;
+            color: #ffffff;
+            box-shadow: 0 12px 24px rgba(17, 24, 39, 0.16);
+        }
+
+        .primary-btn:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 30px rgba(17, 24, 39, 0.22);
+        }
+
+        @@media (max-width: 768px) {
+            .provider-edit-page {
+                margin: 24px auto;
+                padding: 0 14px 30px;
+            }
+
+            .provider-edit-header h2 {
+                font-size: 28px;
+            }
+
+            .provider-edit-card {
+                padding: 22px 18px;
+                border-radius: 22px;
+            }
+
+            .provider-form {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .secondary-btn,
+            .primary-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<div class="provider-edit-page">
+    <div class="provider-edit-header">
+        <h2>@(Model.IsEdit ? "Редактирование поставщика" : "Добавление поставщика")</h2>
+        <p>
+            @(Model.IsEdit
+                ? "Измените данные поставщика, контактную информацию и адрес."
+                : "Заполните информацию о новом поставщике для добавления в систему.")
+        </p>
+    </div>
+
+    <div class="provider-edit-card">
+        @if (Model.IsEdit)
+        {
+            <div class="provider-id-badge">
+                ID поставщика: @Model.Id
+            </div>
+        }
+
+        <form asp-controller="Catalog" asp-action="SaveProvider" method="post">
+            <input asp-for="Id" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <div class="provider-form">
+                <div class="form-group full-width">
+                    <label asp-for="Name" class="form-label">Название поставщика</label>
+                    <input asp-for="Name" class="form-input" placeholder="Например: ООО Поставки Центр" />
+                    <span asp-validation-for="Name" class="validation-text"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ContactFullName" class="form-label">Контактное лицо</label>
+                    <input asp-for="ContactFullName" class="form-input" placeholder="ФИО контактного лица" />
+                    <span asp-validation-for="ContactFullName" class="validation-text"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="form-label">Телефон</label>
+                    <input asp-for="PhoneNumber" class="form-input" placeholder="+7 (999) 123-45-67" type="tel"/>
+                    <span asp-validation-for="PhoneNumber" class="validation-text"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email" class="form-input" placeholder="supplier@example.com" />
+                    <span class="field-hint">Email можно использовать для официальной переписки.</span>
+                    <span asp-validation-for="Email" class="validation-text"></span>
+                </div>
+
+                <div class="form-group full-width">
+                    <label asp-for="Address" class="form-label">Адрес</label>
+                    <textarea asp-for="Address" class="form-textarea" placeholder="Полный адрес поставщика"></textarea>
+                    <span asp-validation-for="Address" class="validation-text"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a asp-controller="Catalog" asp-action="Providers" class="secondary-btn">
+                    Назад к списку
+                </a>
+
+                <button type="submit" class="primary-btn">
+                    @(Model.IsEdit ? "Сохранить изменения" : "Добавить поставщика")
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

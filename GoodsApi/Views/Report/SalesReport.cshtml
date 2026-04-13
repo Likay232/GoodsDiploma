@@ -1,0 +1,549 @@
+@model GoodsApi.Infrastructure.ViewModels.SalesReportViewModel
+
+@{
+    ViewBag.Title = "Отчет по продажам";
+    Layout = "_Layout";
+}
+
+<style>
+    .report-page {
+        max-width: 1300px;
+        margin: 40px auto;
+        padding: 0 20px 40px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #1f2937;
+    }
+
+    .header {
+        margin-bottom: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header h2 {
+        margin: 0;
+        font-size: 34px;
+        font-weight: 700;
+    }
+
+    .header p {
+        margin-top: 10px;
+        font-size: 15px;
+        color: #6b7280;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 28px;
+        padding: 26px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        margin-top: 20px;
+    }
+
+    .form-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .input, .select {
+        border: 1px solid #d1d5db;
+        border-radius: 14px;
+        padding: 12px 14px;
+    }
+
+    .range-container {
+        grid-column: 1 / -1;
+    }
+
+    .range-values {
+        display: flex;
+        gap: 10px;
+    }
+
+    .range-values input {
+        width: 100%;
+    }
+
+    .slider {
+        position: relative;
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+
+    .slider .progress {
+        position: absolute;
+        height: 100%;
+        background: #111827;
+        border-radius: 10px;
+    }
+
+    .range-input {
+        position: relative;
+    }
+
+    .range-input input {
+        position: absolute;
+        width: 100%;
+        height: 6px;
+        top: -6px;
+        background: none;
+        pointer-events: none;
+        -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        pointer-events: auto;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #111827;
+        cursor: pointer;
+        -webkit-appearance: none;
+    }
+
+    .btn {
+        margin-top: 20px;
+        height: 46px;
+        padding: 0 22px;
+        background: #111827;
+        color: #fff;
+        border-radius: 14px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+    }
+
+    .report-table thead {
+        background: #f9fafb;
+    }
+
+    .report-table th {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        padding: 14px;
+        text-align: left;
+    }
+
+    .report-table td {
+        padding: 14px;
+        font-size: 14px;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .report-table tr:hover td {
+        background: #fafafa;
+    }
+
+    .bold {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .price {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .total {
+        color: #047857;
+    }
+
+    .badge-qty {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #eef2ff;
+        color: #3730a3;
+    }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 320px;
+    }
+
+    canvas {
+        max-width: 100%;
+    }
+
+    .view-switch {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .view-switch button {
+        padding: 6px 14px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .view-switch button:hover {
+        background: #f3f4f6;
+    }
+
+    @@media (max-width: 768px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="report-page">
+
+    <div class="header">
+        <h2>Отчет по продажам</h2>
+        <p>Анализ продаж по товарам и суммам</p>
+    </div>
+
+    <div class="card">
+        <div class="form-title">Фильтры</div>
+
+        <form method="post" asp-action="GetSalesReport">
+            <input asp-for="MaximumTotalPriceInDb" type="hidden"/>
+            <div class="grid">
+
+                <div class="form-group">
+                    <label class="form-label">С даты</label>
+                    <input asp-for="StartDate" type="datetime-local" class="input"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">По дату</label>
+                    <input asp-for="EndDate" type="datetime-local" class="input"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Категория</label>
+                    <select asp-for="Category" asp-items="Model.Categories" class="select">
+                        <option value="">Все категории</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Артикул</label>
+                    <input asp-for="Article" class="input"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Название</label>
+                    <input asp-for="Name" class="input"/>
+                </div>
+
+                <div class="range-container">
+                    <label class="form-label">Диапазон суммы</label>
+
+                    <div class="range-values">
+                        <input type="number" id="minInput" asp-for="MinimumTotalPrice" class="input"/>
+                        <input type="number" id="maxInput" asp-for="MaximumTotalPrice" class="input"/>
+                    </div>
+
+                    <div class="slider">
+                        <div class="progress" id="progress"></div>
+                    </div>
+
+                    <div class="range-input">
+                        <input type="range" id="minRange" min="0" max="@Model.MaximumTotalPriceInDb"
+                               value="@Model.MinimumTotalPrice"/>
+                        <input type="range" id="maxRange" min="0" max="@Model.MaximumTotalPriceInDb"
+                               value="@Model.MaximumTotalPrice"/>
+                    </div>
+                </div>
+
+            </div>
+
+            <button class="btn">Сформировать отчет</button>
+        </form>
+    </div>
+
+    @if (Model.SaleReport != null && Model.SaleReport.Any())
+    {
+        <div class="card">
+            <div class="form-title">Результаты</div>
+
+            <div class="table-wrapper">
+                <table class="report-table">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Товар</th>
+                        <th>Артикул</th>
+                        <th>Размер</th>
+                        <th>Кол-во</th>
+                        <th>Цена за ед.</th>
+                        <th>Сумма</th>
+                        <th>Менеджер</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    @foreach (var item in Model.SaleReport)
+                    {
+                        <tr>
+                            <td>@item.Date.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="bold">@item.Name</td>
+                            <td>@item.Article</td>
+                            <td>@item.Size</td>
+                            <td>
+                                <span class="badge badge-qty">
+                                    @item.SoldAmount
+                                </span>
+                            </td>
+                            <td class="price">
+                                @item.PricePerUnit.ToString("N2")
+                            </td>
+                            <td class="price total">
+                                @item.TotalPrice.ToString("N2")
+                            </td>
+                            <td>@item.ManagerName</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="form-title">График продаж</div>
+            <div class="view-switch">
+                <button onclick="setView('day')">Дни</button>
+                <button onclick="setView('month')">Месяцы</button>
+                <button onclick="setView('year')">Годы</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    }
+    else if (Model.SaleReport != null)
+    {
+        <div class="card empty-state">
+            <p>По выбранным фильтрам ничего не найдено</p>
+        </div>
+    }
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const chartData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                          Model.ChartData?.Select(x => new
+                          {
+                              date = x.Date.ToString("yyyy-MM-dd"),
+                              total = x.TotalPrice
+                          })
+                      ));
+
+    const startDate = new Date("@Model.StartDate.ToString("yyyy-MM-dd")");
+    const endDate = new Date("@Model.EndDate.ToString("yyyy-MM-dd")");
+
+    const minRange = document.getElementById("minRange");
+    const maxRange = document.getElementById("maxRange");
+    const minInput = document.getElementById("minInput");
+    const maxInput = document.getElementById("maxInput");
+    const progress = document.getElementById("progress");
+
+    const maxValue = parseInt(maxRange.max);
+
+    function updateSlider() {
+        let minVal = parseInt(minRange.value);
+        let maxVal = parseInt(maxRange.value);
+
+        if (minVal > maxVal) {
+            [minVal, maxVal] = [maxVal, minVal];
+        }
+
+        minInput.value = minVal;
+        maxInput.value = maxVal;
+
+        const left = (minVal / maxValue) * 100;
+        const right = (maxVal / maxValue) * 100;
+
+        progress.style.left = left + "%";
+        progress.style.right = (100 - right) + "%";
+    }
+
+    function updateInputs() {
+        let minVal = parseInt(minInput.value) || 0;
+        let maxVal = parseInt(maxInput.value) || 0;
+
+        minRange.value = minVal;
+        maxRange.value = maxVal;
+
+        updateSlider();
+    }
+
+    minRange.addEventListener("input", updateSlider);
+    maxRange.addEventListener("input", updateSlider);
+    minInput.addEventListener("input", updateInputs);
+    maxInput.addEventListener("input", updateInputs);
+
+    function generateLabels(view) {
+        const labels = [];
+        const current = new Date(startDate);
+
+        while (current <= endDate) {
+            if (view === 'day') {
+                labels.push(formatDay(current));
+                current.setDate(current.getDate() + 1);
+            } else if (view === 'month') {
+                labels.push(formatMonth(current));
+                current.setMonth(current.getMonth() + 1);
+            } else {
+                labels.push(current.getFullYear().toString());
+                current.setFullYear(current.getFullYear() + 1);
+            }
+        }
+
+        return labels;
+    }
+
+    function formatDay(d) {
+        return d.toISOString().slice(0, 10);
+    }
+
+    function formatMonth(d) {
+        return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0');
+    }
+
+    function aggregateData(view) {
+        const map = {};
+
+        chartData.forEach(x => {
+            const d = new Date(x.date);
+            let key;
+
+            if (view === 'day') {
+                key = d.toISOString().slice(0, 10);
+            } else if (view === 'month') {
+                key = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0');
+            } else {
+                key = d.getFullYear().toString();
+            }
+
+            if (!map[key]) map[key] = 0;
+            map[key] += x.total;
+        });
+
+        return map;
+    }
+
+    function buildDataset(view) {
+        const labels = generateLabels(view);
+        const aggregated = aggregateData(view);
+
+        const data = labels.map(label => aggregated[label] || 0);
+
+        return {labels, data};
+    }
+
+    let chart;
+
+    function renderChart(view) {
+        if (!chartData || chartData.length === 0) return;
+
+        const ctx = document.getElementById('salesChart');
+
+        const dataset = buildDataset(view);
+
+        if (chart) {
+            chart.destroy();
+        }
+
+        chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dataset.labels,
+                datasets: [{
+                    label: 'Выручка',
+                    data: dataset.data,
+                    borderRadius: 6,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: true
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.raw.toLocaleString() + ' ₽';
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: "#f3f4f6"
+                        },
+                        ticks: {
+                            callback: function (value) {
+                                return value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function setView(view) {
+        renderChart(view);
+    }
+
+    window.onload = function () {
+        updateSlider();
+        renderChart('day');
+    };
+</script>

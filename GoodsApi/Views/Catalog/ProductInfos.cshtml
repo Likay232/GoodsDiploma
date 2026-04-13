@@ -1,0 +1,650 @@
+@model GoodsApi.Infrastructure.ViewModels.ProductInfosViewModel
+
+@{
+ViewBag.Title = "Реализации товара";
+Layout = "_Layout";
+}
+
+<head>
+    <style>
+        .product-infos-page {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .page-header-left h2 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .page-header-left p {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 150px;
+            height: 46px;
+            padding: 0 18px;
+            border-radius: 14px;
+            background: #f3f4f6;
+            color: #111827;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.18s ease;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+
+        .add-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 190px;
+            height: 46px;
+            padding: 0 18px;
+            border-radius: 14px;
+            background: #111827;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.18s ease;
+            box-shadow: 0 10px 22px rgba(17, 24, 39, 0.14);
+        }
+
+        .add-btn:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(17, 24, 39, 0.20);
+        }
+
+        .add-btn img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .product-main-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.05);
+            margin-bottom: 34px;
+        }
+
+        .product-main-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .product-main-title h3 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.2;
+        }
+
+        .product-main-title p {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .product-id-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .product-main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .main-info-block {
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: #f9fafb;
+            border: 1px solid #f3f4f6;
+        }
+
+        .main-info-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .main-info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+
+        .minimum-remain {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #dbeafe;
+        }
+
+        .infos-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .infos-section-header h3 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .infos-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 16px;
+            border-radius: 14px;
+            background: #f3f4f6;
+            color: #111827;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #e5e7eb;
+        }
+
+        .infos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 22px;
+        }
+
+        .info-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-height: 320px;
+        }
+
+        .info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.07);
+            border-color: #d1d5db;
+        }
+
+        .info-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .article-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .article-title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        .info-id-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .info-card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .info-block {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: #f9fafb;
+            border: 1px solid #f3f4f6;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+
+        .price-chip {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #ecfdf5;
+            color: #047857;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #d1fae5;
+        }
+
+        .amount-chip {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #dbeafe;
+        }
+
+        .card-actions {
+            margin-top: auto;
+            padding-top: 8px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.18s ease;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            border-color: #d1d5db;
+            background: #f9fafb;
+        }
+
+        .icon-btn img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        .delete-btn {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .delete-btn:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        .delete-form {
+            margin: 0;
+        }
+
+        .empty-state {
+            margin-top: 20px;
+            padding: 48px 28px;
+            border-radius: 28px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .empty-state h3 {
+            margin: 0 0 12px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        @@media (max-width: 768px) {
+            .product-infos-page {
+                margin: 24px auto;
+                padding: 0 14px;
+            }
+
+            .page-header-left h2 {
+                font-size: 28px;
+            }
+
+            .product-main-card,
+            .info-card {
+                padding: 20px;
+                border-radius: 20px;
+            }
+
+            .product-main-title h3 {
+                font-size: 24px;
+            }
+
+            .infos-section-header h3 {
+                font-size: 24px;
+            }
+
+            .infos-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .info-card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .back-btn,
+            .add-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<div class="product-infos-page">
+    <div class="page-header">
+        <div class="page-header-left">
+            <h2>Реализации товара</h2>
+            <p>Детальная информация по всем доступным вариантам выбранного товара.</p>
+        </div>
+
+        <div class="header-actions">
+            <a asp-controller="Catalog"
+               asp-action="Products"
+               class="back-btn">
+                Назад к каталогу
+            </a>
+
+            @if (User.IsInRole("Admin"))
+            {
+            <a asp-controller="Catalog"
+               asp-action="ProductInfoEditPage"
+                  asp-route-productId="@Model.Product.Id"
+                  class="add-btn">
+                <img src="~/images/add.svg" alt="Добавить" />
+                <span>Добавить реализацию</span>
+            </a>
+            }
+        </div>
+    </div>
+
+    <div class="product-main-card">
+        <div class="product-main-top">
+            <div class="product-main-title">
+                <h3>@Model.Product.Name</h3>
+                <p>Основная карточка товара</p>
+            </div>
+
+            <span class="product-id-badge">ID: @Model.Product.Id</span>
+        </div>
+
+        <div class="product-main-grid">
+            <div class="main-info-block">
+                <div class="main-info-label">Категория</div>
+                <div class="main-info-value">@Model.Product.Category</div>
+            </div>
+
+            <div class="main-info-block">
+                <div class="main-info-label">Бренд</div>
+                <div class="main-info-value">@Model.Product.Brand</div>
+            </div>
+
+            <div class="main-info-block">
+                <div class="main-info-label">Минимальный остаток</div>
+                <div class="main-info-value">
+                    <span class="minimum-remain">@Model.Product.MinimumRemain</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="infos-section-header">
+        <h3>Реализации</h3>
+
+        <div class="infos-count">
+            Всего реализаций: @Model.ProductInfos.Count
+        </div>
+    </div>
+
+    @if (Model.ProductInfos.Any())
+    {
+    <div class="infos-grid">
+        @foreach (var info in Model.ProductInfos)
+        {
+        <div class="info-card">
+            <div class="info-card-top">
+                <div class="article-block">
+                    <h4 class="article-title">@info.Article</h4>
+                </div>
+
+                <span class="info-id-badge">ID: @info.Id</span>
+            </div>
+
+            <div class="info-card-grid">
+                <div class="info-block">
+                    <div class="info-label">Цена</div>
+                    <div class="info-value">
+                        <span class="price-chip">@info.Price</span>
+                    </div>
+                </div>
+
+                <div class="info-block">
+                    <div class="info-label">Размер</div>
+                    <div class="info-value">@info.Size</div>
+                </div>
+
+                <div class="info-block">
+                    <div class="info-label">Цвет</div>
+                    <div class="info-value">@info.Color</div>
+                </div>
+
+                <div class="info-block">
+                    <div class="info-label">Количество</div>
+                    <div class="info-value">
+                        <span class="amount-chip">@info.Amount</span>
+                    </div>
+                </div>
+
+                <div class="info-block" style="grid-column: 1 / -1;">
+                    <div class="info-label">Расположение</div>
+                    <div class="info-value">@info.Location</div>
+                </div>
+            </div>
+
+            @if (User.IsInRole("Admin"))
+            {
+            <div class="card-actions">
+                <a asp-controller="Catalog"
+                   asp-action="ProductInfoEditPage"
+                   asp-route-productInfoId="@info.Id"
+                   asp-route-productId="@Model.Product.Id"
+                   class="icon-btn"
+                   title="Редактировать">
+                    <img src="~/images/edit.svg" alt="Редактировать" />
+                </a>
+
+                <form asp-controller="Catalog"
+                      asp-action="DeleteProductInfo"
+                      asp-route-productInfoId="@info.Id"
+                      asp-route-productId="@Model.Product.Id"
+                      method="post"
+                      class="delete-form"
+                      onsubmit="return confirm('Удалить данную реализацию товара?');">
+                    <button type="submit"
+                            class="icon-btn delete-btn"
+                            title="Удалить">
+                        <img src="~/images/delete.svg" alt="Удалить" />
+                    </button>
+                </form>
+            </div>
+            }
+            @if (User.IsInRole("Manager"))
+            {
+                <a asp-controller="Manager"
+                   asp-action="SaleRegistrationPage"
+                   asp-route-productInfoId="@info.Id"
+                   class="icon-btn"
+                   title="Продать">
+                    <img src="~/images/sell.png" alt="Продать" />
+                </a>
+            }
+            @if (User.IsInRole("Storekeeper"))
+            {
+                <div class="card-actions">
+                    <a asp-controller="Storekeeper"
+                       asp-action="SupplyRegistrationPage"
+                       asp-route-productInfoId="@info.Id"
+                       class="icon-btn"
+                       title="Регистрация поставки">
+                        <img src="~/images/supply.png" alt="Регистрация поставки" />
+                    </a>
+
+                    <a asp-controller="Storekeeper"
+                       asp-action="WriteOffRegistrationPage"
+                       asp-route-productInfoId="@info.Id"
+                       class="icon-btn"
+                       title="Списать">
+                        <img src="~/images/writeoff.png" alt="Списать"/>
+                    </a>
+
+                    <a asp-controller="Storekeeper"
+                       asp-action="InventorizationPage"
+                       asp-route-productInfoId="@info.Id"
+                       class="icon-btn"
+                       title="Инвентаризация">
+                        <img src="~/images/inventorization.png" alt="Инвентаризация"/>
+                    </a>
+                </div>
+            }
+        </div>
+        }
+    </div>
+    }
+    else
+    {
+    <div class="empty-state">
+        <h3>Реализации пока отсутствуют</h3>
+        <p>
+            Для данного товара ещё не добавлено ни одной реализации.
+            После добавления они появятся здесь.
+        </p>
+    </div>
+    }
+</div>

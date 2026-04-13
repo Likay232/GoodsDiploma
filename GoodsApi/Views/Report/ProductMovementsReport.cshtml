@@ -1,0 +1,412 @@
+@model GoodsApi.Infrastructure.ViewModels.ProductMovementReportViewModel
+
+@{
+    ViewBag.Title = "Отчет по движению товаров";
+    Layout = "_Layout";
+
+    var typeDisplayNames = new Dictionary<string, string>
+    {
+        { "Supply", "Поставка" },
+        { "Sale", "Продажа" },
+        { "WriteOff", "Списание" },
+        { "Inventory", "Инвентаризация" }
+    };
+}
+
+<head>
+    <style>
+        .report-page {
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 20px 40px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .header {
+            margin-bottom: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .header p {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 26px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+            margin-top: 20px;
+        }
+
+        .form-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .input,
+        .select {
+            border: 1px solid #d1d5db;
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-size: 14px;
+            transition: 0.18s;
+        }
+
+        .input:focus,
+        .select:focus {
+            border-color: #111827;
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06);
+            outline: none;
+        }
+
+        .multi-select {
+            height: 130px;
+        }
+
+        .btn {
+            margin-top: 20px;
+            height: 46px;
+            padding: 0 22px;
+            background: #111827;
+            color: #ffffff;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.18s;
+            box-shadow: 0 10px 22px rgba(17, 24, 39, 0.14);
+        }
+
+        .btn:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+        }
+
+        .validation {
+            font-size: 12px;
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .validation-summary-errors {
+            margin-bottom: 16px;
+            padding: 14px;
+            border-radius: 16px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        /* ===== TABLE ===== */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+        }
+
+        thead {
+            background: #f9fafb;
+        }
+
+        th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 14px;
+            font-size: 14px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        tr:hover td {
+            background: #fafafa;
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #f3f4f6;
+        }
+
+        .badge-in {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .badge-out {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .custom-multiselect {
+            position: relative;
+            user-select: none;
+        }
+
+        .select-box {
+            border: 1px solid #d1d5db;
+            border-radius: 14px;
+            padding: 12px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+        }
+
+        .checkbox-list {
+            display: none;
+            position: absolute;
+            width: 100%;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            margin-top: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .checkbox-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background: #f9fafb;
+        }
+
+        .arrow {
+            font-size: 12px;
+        }
+
+        @@media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<div class="report-page">
+
+    <div class="header">
+        <h2>Отчет по движению товаров</h2>
+        <p>Анализ операций поступления, продаж, списаний и инвентаризаций</p>
+    </div>
+
+    <!-- ФИЛЬТРЫ -->
+    <div class="card">
+        <div class="form-title">Фильтры</div>
+
+        <form method="post" asp-action="GetProductMovementsReport">
+
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <div class="grid">
+
+                <div class="form-group">
+                    <label class="form-label">С даты</label>
+                    <input asp-for="StartDate" type="datetime-local" class="input"/>
+                    <span asp-validation-for="StartDate" class="validation"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">По дату</label>
+                    <input asp-for="EndDate" type="datetime-local" class="input"/>
+                    <span asp-validation-for="EndDate" class="validation"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Категория</label>
+                    <select asp-for="Category" asp-items="Model.Categories" class="select">
+                        <option value="">Все категории</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Артикул</label>
+                    <input asp-for="Article" class="input"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Название</label>
+                    <input asp-for="Name" class="input"/>
+                </div>
+
+                <div class="form-group full">
+                    <label class="form-label">Типы операций</label>
+                    <div class="custom-multiselect">
+                        <div class="select-box" onclick="toggleDropdown()">
+                            <span id="selectedText">Выберите типы операций</span>
+                            <span class="arrow">▼</span>
+                        </div>
+
+                        <div id="checkboxList" class="checkbox-list">
+                            @foreach (var type in Model.OperationTypes)
+                            {
+                                var isChecked = Model.SelectedOperationTypes?.Contains(type) == true;
+                                var displayName = typeDisplayNames.TryGetValue(type, out var name) ? name : type;
+
+                                <label class="checkbox-item">
+                                    <input type="checkbox"
+                                           name="SelectedOperationTypes"
+                                           value="@type"
+                                           data-display-name="@displayName"
+                                           @(isChecked ? "checked" : "")
+                                           onchange="updateSelectedText()"/>
+                                    <span>@displayName</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn">Сформировать отчет</button>
+        </form>
+    </div>
+
+    <!-- РЕЗУЛЬТАТ -->
+    @if (Model.ProductMotionReportEntries.Any())
+    {
+        <div class="card">
+            <div class="form-title">Результаты</div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Товар</th>
+                        <th>Артикул</th>
+                        <th>Тип операции</th>
+                        <th>Количество</th>
+                        <th>Контрагент</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    @foreach (var item in Model.ProductMotionReportEntries)
+                    {
+                        var badgeClass = item.OperationType.Contains("Приход")
+                            ? "badge badge-in"
+                            : item.OperationType.Contains("Списание") || item.OperationType.Contains("Продажа")
+                                ? "badge badge-out"
+                                : "badge";
+
+                        <tr>
+                            <td>@item.OperationDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@item.ProductName</td>
+                            <td>@item.Article</td>
+                            <td>
+                                <span class="@badgeClass">
+                                    @item.OperationType
+                                </span>
+                            </td>
+                            <td>@(item.Quantity > 0 ? $"+{item.Quantity}" : $"{item.Quantity}")</td>
+                            <td>@item.CounterAgent</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (Model.ProductMotionReportEntries != null)
+    {
+        <div class="card empty-state">
+            <p>По выбранным фильтрам ничего не найдено</p>
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+
+    <script>
+        function toggleDropdown() {
+            const list = document.getElementById("checkboxList");
+            list.style.display = list.style.display === "block" ? "none" : "block";
+        }
+
+        function updateSelectedText() {
+            const checked = document.querySelectorAll('input[name="SelectedOperationTypes"]:checked');
+            const text = Array.from(checked).map(x => x.getAttribute('data-display-name')).join(", ");
+
+            document.getElementById("selectedText").innerText =
+                text || "Все типы операций";
+        }
+
+        document.addEventListener("click", function (e) {
+            const container = document.querySelector(".custom-multiselect");
+            if (!container.contains(e.target)) {
+                document.getElementById("checkboxList").style.display = "none";
+            }
+        });
+
+        window.onload = updateSelectedText;
+    </script>
+}

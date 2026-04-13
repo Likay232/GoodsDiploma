@@ -1,0 +1,360 @@
+@model GoodsApi.Infrastructure.ViewModels.SupplyRegistrationViewModel
+
+@{
+ViewBag.Title = "Регистрация поставки";
+Layout = "_Layout";
+
+var availableAmount = Model.ProductInfo?.Amount ?? 0;
+var defaultDate = Model.AcceptanceDate == default ? DateTime.Now : Model.AcceptanceDate;
+}
+
+<head>
+    <style>
+        .supply-page {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px 40px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .supply-header {
+            margin-bottom: 28px;
+        }
+
+        .supply-header h2 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .supply-header p {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .layout {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .info-card,
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ===== PRODUCT CARD (ИДЕНТИЧНО СПИСАНИЮ) ===== */
+
+        .product-info-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .product-title {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .product-subtitle {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .meta-badge {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #f9fafb;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stock-badge {
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .stock-good { background: #ecfdf5; color: #047857; }
+        .stock-low { background: #fffbeb; color: #b45309; }
+        .stock-empty { background: #fef2f2; color: #b91c1c; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .info-block {
+            padding: 16px;
+            border-radius: 20px;
+            background: #f9fafb;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* ===== FORM ===== */
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .full { grid-column: 1 / -1; }
+
+        .form-input,
+        .form-select {
+            border: 1px solid #d1d5db;
+            border-radius: 16px;
+            padding: 14px;
+            background-color: #fff;
+        }
+
+        .summary-box {
+            margin-top: 26px;
+            padding: 18px;
+            border-radius: 22px;
+            background: #ecfeff;
+            border: 1px solid #a5f3fc;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0e7490;
+        }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: #111827;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .secondary-btn {
+            background: #f3f4f6;
+            padding: 12px 20px;
+            border-radius: 14px;
+            text-decoration: none;
+            color: #111827;
+        }
+        
+        .validation-text {
+            font-size: 13px;
+            color: #dc2626;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        @@media(max-width:768px){
+            .form-grid, .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<div class="supply-page">
+    <div class="supply-header">
+        <h2>Регистрация поставки</h2>
+        <p>Приём товара от поставщика на склад.</p>
+    </div>
+
+    <div class="layout">
+
+        @{
+        var stockClass = availableAmount <= 0 ? "stock-empty"
+        : availableAmount <= 5 ? "stock-low"
+        : "stock-good";
+
+        var stockText = availableAmount <= 0 ? "Нет"
+        : availableAmount <= 5 ? "Мало"
+        : "В наличии";
+        }
+
+        <!-- ===== КАРТОЧКА ТОВАРА ===== -->
+        <div class="info-card">
+            <div class="product-info-top">
+                <div>
+                    <h3 class="product-title">@Model.ProductInfo.Article</h3>
+
+                    <div class="product-subtitle">
+                        <span class="meta-badge">ID: @Model.ProductInfo.Id</span>
+                    </div>
+                </div>
+
+                <span class="stock-badge @stockClass">
+                    @stockText @availableAmount
+                </span>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-block">
+                    <div class="info-label">Цена продажи</div>
+                    <div class="info-value">@Model.ProductInfo.Price</div>
+                </div>
+
+                <div class="info-block">
+                    <div class="info-label">Размер</div>
+                    <div class="info-value">@Model.ProductInfo.Size</div>
+                </div>
+
+                <div class="info-block">
+                    <div class="info-label">Цвет</div>
+                    <div class="info-value">@Model.ProductInfo.Color</div>
+                </div>
+
+                <div class="info-block">
+                    <div class="info-label">Остаток</div>
+                    <div class="info-value">@Model.ProductInfo.Amount</div>
+                </div>
+
+                <div class="info-block" style="grid-column:1/-1;">
+                    <div class="info-label">Локация</div>
+                    <div class="info-value">@Model.ProductInfo.Location</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ФОРМА ===== -->
+        <div class="form-card">
+            <h3 class="form-title">Данные поставки</h3>
+
+            <form asp-controller="Storekeeper"
+                  asp-action="RegisterSupplyOperation"
+                  method="post">
+
+                <input asp-for="ProductInfo.Id" type="hidden" />
+                <input asp-for="ProductInfo.ProductId" type="hidden" />
+                <input asp-for="ProductInfo.Article" type="hidden" />
+                <input asp-for="ProductInfo.Price" type="hidden" />
+                <input asp-for="ProductInfo.Size" type="hidden" />
+                <input asp-for="ProductInfo.Color" type="hidden" />
+                <input asp-for="ProductInfo.Amount" type="hidden" />
+                <input asp-for="ProductInfo.Location" type="hidden" />
+                <input asp-for="UserId" type="hidden" />
+
+                <div class="form-grid">
+
+                    <div asp-validation-summary="ModelOnly" class="validation-text"></div>
+
+                    <div class="form-group full">
+                        <label asp-for="ProviderId"></label>
+                        <select asp-for="ProviderId"
+                                asp-items="Model.Providers"
+                                class="form-select">
+                            <option value="">Выберите поставщика</option>
+                        </select>
+                        <span asp-validation-for="ProviderId" class="validation-text"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Amount"></label>
+                        <input asp-for="Amount" type="number" min="1" class="form-input"/>
+                        <span asp-validation-for="Amount" class="validation-text"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PurchasePrice"></label>
+                        <input asp-for="PurchasePrice" type="number" step="0.01" class="form-input"/>
+                        <span asp-validation-for="PurchasePrice" class="validation-text"></span>
+                    </div>
+
+                    <div class="form-group full">
+                        <label asp-for="AcceptanceDate"></label>
+                        <input asp-for="AcceptanceDate"
+                               type="datetime-local"
+                               value="@defaultDate.ToString("yyyy-MM-ddTHH:mm")"
+                               class="form-input"/>
+                        <span asp-validation-for="AcceptanceDate" class="validation-text"></span>
+                    </div>                </div>
+
+                <div class="summary-box">
+                    <div>Сумма поставки</div>
+                    <div class="summary-value" id="total">0</div>
+                </div>
+
+                <div class="actions">
+                    <a asp-controller="Catalog"
+                       asp-action="ProductInfos"
+                       asp-route-productId="@Model.ProductInfo.ProductId"
+                       class="secondary-btn">
+                        Назад
+                    </a>
+
+                    <button type="submit" class="btn-primary">
+                        Сохранить
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts{
+<script>
+    const a = document.getElementById("Amount");
+    const p = document.getElementById("PurchasePrice");
+    const t = document.getElementById("total");
+
+    function calc(){
+        const total = (parseFloat(a.value||0) * parseFloat(p.value||0));
+        t.textContent = isNaN(total)? "0" : total.toFixed(2);
+    }
+
+    a?.addEventListener("input", calc);
+    p?.addEventListener("input", calc);
+    calc();
+</script>
+}

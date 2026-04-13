@@ -1,0 +1,437 @@
+@model GoodsApi.Infrastructure.ViewModels.ProvidersViewModel
+
+@{
+    ViewBag.Title = "Поставщики";
+    Layout = "_Layout";
+}
+
+<head>
+    <style>
+        .providers-page {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .providers-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .providers-header-left h2 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .providers-header-left p {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .providers-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .providers-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 16px;
+            border-radius: 14px;
+            background: #f3f4f6;
+            color: #111827;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #e5e7eb;
+        }
+
+        .add-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 190px;
+            height: 44px;
+            padding: 0 18px;
+            border-radius: 14px;
+            background: #111827;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.18s ease;
+            box-shadow: 0 10px 22px rgba(17, 24, 39, 0.14);
+        }
+
+        .add-btn:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(17, 24, 39, 0.20);
+        }
+
+        .add-btn img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .providers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 22px;
+        }
+
+        .provider-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-height: 360px;
+        }
+
+        .provider-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.07);
+            border-color: #d1d5db;
+        }
+
+        .provider-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .provider-title-block {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .provider-name {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.25;
+            word-break: break-word;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .provider-id {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .provider-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .info-block {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: #f9fafb;
+            border: 1px solid #f3f4f6;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+
+        .info-value.muted {
+            color: #6b7280;
+        }
+
+        .provider-actions {
+            margin-top: auto;
+            padding-top: 6px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.18s ease;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            border-color: #d1d5db;
+            background: #f9fafb;
+        }
+
+        .icon-btn img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        .delete-btn {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .delete-btn:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        .delete-form {
+            margin: 0;
+        }
+
+        .empty-state {
+            margin-top: 24px;
+            padding: 48px 28px;
+            border-radius: 28px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .empty-state h3 {
+            margin: 0 0 12px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        @@media (max-width: 768px) {
+            .providers-page {
+                margin: 24px auto;
+                padding: 0 14px;
+            }
+
+            .providers-header-left h2 {
+                font-size: 28px;
+            }
+
+            .providers-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .provider-card {
+                padding: 20px;
+                border-radius: 20px;
+                min-height: auto;
+            }
+
+            .provider-name {
+                font-size: 20px;
+            }
+
+            .provider-title-block {
+                align-items: flex-start;
+            }
+
+            .provider-actions {
+                justify-content: flex-end;
+            }
+
+            .providers-header-right {
+                width: 100%;
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<div class="providers-page">
+    <div class="providers-header">
+        <div class="providers-header-left">
+            <h2>Поставщики</h2>
+            <p>Просмотр всех поставщиков, контактных данных и адресной информации.</p>
+        </div>
+
+        <div class="providers-header-right">
+            <div class="providers-count">
+                Всего поставщиков: @Model.Providers.Count
+            </div>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Catalog"
+                   asp-action="ProviderEditPage"
+                   class="add-btn">
+                    <img src="~/images/add.svg" alt="Добавить" />
+                    <span>Добавить поставщика</span>
+                </a>
+            }
+        </div>
+    </div>
+
+    @if (Model.Providers.Any())
+    {
+        <div class="providers-grid">
+            @foreach (var provider in Model.Providers)
+            {
+                <div class="provider-card">
+                    <div class="provider-top">
+                        <div class="provider-title-block">
+                            <h3 class="provider-name">@provider.Name</h3>
+                            <span class="provider-id">ID: @provider.Id</span>
+                        </div>
+                    </div>
+
+                    <div class="provider-info">
+                        <div class="info-block">
+                            <div class="info-label">Контактное лицо</div>
+                            <div class="info-value">
+                                @(string.IsNullOrWhiteSpace(provider.ContactFullName)
+                                    ? "Не указано"
+                                    : provider.ContactFullName)
+                            </div>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-label">Телефон</div>
+                            <div class="info-value">
+                                @(string.IsNullOrWhiteSpace(provider.PhoneNumber)
+                                    ? "Не указан"
+                                    : provider.PhoneNumber)
+                            </div>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">
+                                @(string.IsNullOrWhiteSpace(provider.Email)
+                                    ? "Не указан"
+                                    : provider.Email)
+                            </div>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-label">Адрес</div>
+                            <div class="info-value">
+                                @(string.IsNullOrWhiteSpace(provider.Address)
+                                    ? "Не указан"
+                                    : provider.Address)
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="provider-actions">
+                            <div class="admin-actions">
+                                <a asp-controller="Catalog"
+                                   asp-action="ProviderEditPage"
+                                   asp-route-providerId="@provider.Id"
+                                   class="icon-btn"
+                                   title="Редактировать">
+                                    <img src="~/images/edit.svg" alt="Редактировать" />
+                                </a>
+
+                                <form asp-controller="Catalog"
+                                      asp-action="DeleteProvider"
+                                      asp-route-providerId="@provider.Id"
+                                      method="post"
+                                      class="delete-form"
+                                      onsubmit="return confirm('Удалить поставщика?');">
+                                    <button type="submit"
+                                            class="icon-btn delete-btn"
+                                            title="Удалить">
+                                        <img src="~/images/delete.svg" alt="Удалить" />
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <h3>Поставщики пока отсутствуют</h3>
+            <p>
+                В системе ещё нет ни одного поставщика.
+                После добавления они появятся здесь.
+            </p>
+        </div>
+    }
+</div>
