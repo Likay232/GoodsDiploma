@@ -46,4 +46,21 @@ public class ReportController(ReportService reportService) : Controller
         
         return View("SalesReport", viewModel);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> DeliveriesReport()
+    {
+        var viewModel = await reportService.GetDeliveryReportViewModel();
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> GetDeliveryReport(DeliveryReportViewModel viewModel)
+    {
+        viewModel.DeliveryReport = await reportService.GetDeliveryReport(viewModel);
+        viewModel.Categories = await reportService.GetCategoriesSelectList();
+        viewModel.Providers = await reportService.GetProvidersSelectList();
+
+        return View("DeliveriesReport", viewModel);
+    }
 }

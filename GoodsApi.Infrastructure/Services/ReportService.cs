@@ -28,7 +28,7 @@ public class ReportService(DataComponent component, CatalogService catalogServic
 
         viewModel.OperationTypes = operationTypes;
     }
-    
+
     public async Task<List<SelectListItem>> GetCategoriesSelectList()
     {
         var products = await catalogService.GetProducts();
@@ -44,6 +44,18 @@ public class ReportService(DataComponent component, CatalogService catalogServic
                 Text = c
             })
             .ToList();
+    }
+
+    public async Task<List<SelectListItem>> GetProvidersSelectList()
+    {
+        var providers = (await catalogService.GetProviders())
+            .Select(pm => new SelectListItem()
+            {
+                Text = pm.Name,
+                Value = pm.Name
+            });
+
+        return providers.ToList();
     }
 
     public async Task<List<ProductMotionReportEntry>> GetProductMovementsReport(
@@ -121,5 +133,45 @@ public class ReportService(DataComponent component, CatalogService catalogServic
                 TotalPrice = g.Sum(s => s.TotalPrice)
             })
             .ToList();
+    }
+
+    public async Task<DeliveryReportViewModel> GetDeliveryReportViewModel()
+    {
+        var viewModel = new DeliveryReportViewModel();
+
+        var t = component.SupplyOperations.ToList();
+        
+        viewModel.Categories = await GetCategoriesSelectList();
+        viewModel.Providers = await GetProvidersSelectList();
+        viewModel.MaximumSupplyTotalPriceInDb = component.SupplyOperations.Max(s => s.Amount * s.PurchasePrice);
+        viewModel.MaximumSupplyTotalPrice = viewModel.MaximumSupplyTotalPriceInDb;
+        return viewModel;
+    }
+
+    public async Task<List<DeliveryReportEntry>> GetDeliveryReport(DeliveryReportViewModel viewModel)
+    {
+        var deliveries = component.SupplyOperations
+            .Include(u => u.User)
+            .Include(u => u.Provider)
+            .Include(o => o.ProductInfo)
+            .ThenInclude(o => o!.Product)
+            .Where(s =>
+                s.AcceptanceDate >= viewModel.StartDate.ToUniversalTime() &&
+                s.AcceptanceDate <= viewModel.EndDate.ToUniversalTime());
+
+        if (viewModel.Category is not null)
+            deliveries = deliveries.Where(o => o.ProductInfo!.Product!.Category == viewModel.Category);
+
+        if (viewModel.SelectedProviders is not null && viewModel.SelectedProviders.Any())
+            deliveries = deliveries.Where(d => viewModel.SelectedProviders.Contains(d.Provider!.Name));
+
+        var deliveriesList = deliveries.ToList();
+
+        deliveriesList = deliveriesList.Where(d =>
+                d.TotalPrice >= viewModel.MinimumSupplyTotalPrice &&
+                d.TotalPrice <= viewModel.MaximumSupplyTotalPrice)
+            .ToList();
+
+        return deliveriesList.Convert<Models.Storage.SupplyOperation, DeliveryReportEntry>();
     }
 }

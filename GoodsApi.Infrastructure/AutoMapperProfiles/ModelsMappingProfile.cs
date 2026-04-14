@@ -69,6 +69,34 @@ public class ModelsMappingProfile : Profile
                     ? src.User.Username 
                     : ""));
         CreateMap<Models.DTO.SalesReportEntry, Models.DTO.SaleReportChartData>();
+        CreateMap<Models.Storage.SupplyOperation, Models.DTO.DeliveryReportEntry>()
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.AcceptanceDate.ToLocalTime()))
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => 
+                src.ProductInfo != null && src.ProductInfo.Product != null 
+                    ? src.ProductInfo.Product.Name 
+                    : ""))
+            .ForMember(dest => dest.Article, opt => opt.MapFrom(src => 
+                src.ProductInfo != null 
+                    ? src.ProductInfo.Article 
+                    : ""))
+            .ForMember(dest => dest.Size, opt => opt.MapFrom(src => 
+                src.ProductInfo != null 
+                    ? src.ProductInfo.Size 
+                    : 0))
+            .ForMember(dest => dest.Color, opt => opt.MapFrom(src => 
+                src.ProductInfo != null 
+                    ? src.ProductInfo.Color 
+                    : ""))
+            .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
+            .ForMember(dest => dest.PurchasePrice, opt => opt.MapFrom(src => src.PurchasePrice))
+            .ForMember(dest => dest.Provider, opt => opt.MapFrom(src => 
+                src.Provider != null 
+                    ? src.Provider.Name 
+                    : ""))
+            .ForMember(dest => dest.StorekeeperUsername, opt => opt.MapFrom(src => 
+                src.User != null 
+                    ? src.User.Username 
+                    : ""));
     }
 
     private string MapOperationType(string operationType)

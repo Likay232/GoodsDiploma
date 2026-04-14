@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace GoodsApi.Infrastructure.Models.Storage;
 
 public class SupplyOperation : BaseEntity
@@ -8,6 +10,10 @@ public class SupplyOperation : BaseEntity
     
     public int Amount { get; set; }
     public decimal PurchasePrice { get; set; }
+    
+    [NotMapped]
+    public decimal TotalPrice => PurchasePrice * Amount;
+    
     public DateTime AcceptanceDate { get; set; }
     
     public virtual ProductInfo? ProductInfo { get; set; }

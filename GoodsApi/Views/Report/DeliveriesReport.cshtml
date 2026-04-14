@@ -1,0 +1,460 @@
+@model GoodsApi.Infrastructure.ViewModels.DeliveryReportViewModel
+
+@{
+    ViewBag.Title = "Отчет по поставкам";
+    Layout = "_Layout";
+}
+
+<style>
+    .report-page {
+        max-width: 1300px;
+        margin: 40px auto;
+        padding: 0 20px 40px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #1f2937;
+    }
+
+    .header {
+        margin-bottom: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header h2 {
+        margin: 0;
+        font-size: 34px;
+        font-weight: 700;
+    }
+
+    .header p {
+        margin-top: 10px;
+        font-size: 15px;
+        color: #6b7280;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 28px;
+        padding: 26px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        margin-top: 20px;
+    }
+
+    .form-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .input, .select {
+        border: 1px solid #d1d5db;
+        border-radius: 14px;
+        padding: 12px 14px;
+    }
+
+    .range-container {
+        grid-column: 1 / -1;
+    }
+
+    .range-values {
+        display: flex;
+        gap: 10px;
+    }
+
+    .range-values input {
+        width: 100%;
+    }
+
+    .slider {
+        position: relative;
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+
+    .slider .progress {
+        position: absolute;
+        height: 100%;
+        background: #111827;
+        border-radius: 10px;
+    }
+
+    .range-input {
+        position: relative;
+    }
+
+    .range-input input {
+        position: absolute;
+        width: 100%;
+        height: 6px;
+        top: -6px;
+        background: none;
+        pointer-events: none;
+        -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        pointer-events: auto;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #111827;
+        cursor: pointer;
+        -webkit-appearance: none;
+    }
+
+    .btn {
+        margin-top: 20px;
+        height: 46px;
+        padding: 0 22px;
+        background: #111827;
+        color: #fff;
+        border-radius: 14px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+    }
+
+    .report-table thead {
+        background: #f9fafb;
+    }
+
+    .report-table th {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        padding: 14px;
+        text-align: left;
+    }
+
+    .report-table td {
+        padding: 14px;
+        font-size: 14px;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .report-table tr:hover td {
+        background: #fafafa;
+    }
+
+    .bold {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .price {
+        font-weight: 600;
+    }
+
+    .total {
+        color: #047857;
+        font-weight: 700;
+    }
+
+    .badge-qty {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #eef2ff;
+        color: #3730a3;
+    }
+
+    .custom-multiselect {
+        position: relative;
+        user-select: none;
+    }
+
+    .select-box {
+        border: 1px solid #d1d5db;
+        border-radius: 14px;
+        padding: 12px 14px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+    }
+
+    .checkbox-list {
+        display: none;
+        position: absolute;
+        width: 100%;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        margin-top: 6px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 10;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .checkbox-item {
+        display: flex;
+        gap: 10px;
+        padding: 10px 12px;
+        cursor: pointer;
+    }
+
+    .checkbox-item:hover {
+        background: #f9fafb;
+    }
+
+    .arrow {
+        font-size: 12px;
+    }
+
+    @@media (max-width: 768px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="report-page">
+
+    <div class="header">
+        <h2>Отчет по поставкам</h2>
+        <p>Анализ поступлений товаров от поставщиков</p>
+    </div>
+
+    <div class="card">
+        <div class="form-title">Фильтры</div>
+
+        <form method="post" asp-action="GetDeliveryReport">
+            <input asp-for="MaximumSupplyTotalPriceInDb" type="hidden"/>
+
+            <div class="grid">
+
+                <div class="form-group">
+                    <label class="form-label">С даты</label>
+                    <input asp-for="StartDate" type="datetime-local" class="input"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">По дату</label>
+                    <input asp-for="EndDate" type="datetime-local" class="input"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Категория</label>
+                    <select asp-for="Category" asp-items="Model.Categories" class="select">
+                        <option value="">Все категории</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Поставщики</label>
+
+                    <div class="custom-multiselect">
+                        <div class="select-box" onclick="toggleProvidersDropdown()">
+                            <span id="selectedProvidersText">Выберите поставщиков</span>
+                            <span class="arrow">▼</span>
+                        </div>
+
+                        <div id="providersCheckboxList" class="checkbox-list">
+                            @foreach (var provider in Model.Providers)
+                            {
+                                var isChecked = Model.SelectedProviders?.Contains(provider.Value) == true;
+
+                                <label class="checkbox-item">
+                                    <input type="checkbox"
+                                           name="SelectedProviders"
+                                           value="@provider.Value"
+                                           data-display-name="@provider.Text"
+                                           @(isChecked ? "checked" : "")
+                                           onchange="updateSelectedProvidersText()" />
+                                    <span>@provider.Text</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="range-container">
+                    <label class="form-label">Диапазон суммы поставки</label>
+
+                    <div class="range-values">
+                        <input type="number" id="minInput" asp-for="MinimumSupplyTotalPrice" class="input"/>
+                        <input type="number" id="maxInput" asp-for="MaximumSupplyTotalPrice" class="input"/>
+                    </div>
+
+                    <div class="slider">
+                        <div class="progress" id="progress"></div>
+                    </div>
+
+                    <div class="range-input">
+                        <input type="range" id="minRange" min="0" max="@Model.MaximumSupplyTotalPriceInDb"
+                               value="@Model.MinimumSupplyTotalPrice"/>
+                        <input type="range" id="maxRange" min="0" max="@Model.MaximumSupplyTotalPriceInDb"
+                               value="@Model.MaximumSupplyTotalPrice"/>
+                    </div>
+                </div>
+
+            </div>
+
+            <button class="btn">Сформировать отчет</button>
+        </form>
+    </div>
+
+    @if (Model.DeliveryReport != null && Model.DeliveryReport.Any())
+    {
+        <div class="card">
+            <div class="form-title">Результаты</div>
+
+            <div class="table-wrapper">
+                <table class="report-table">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Товар</th>
+                        <th>Артикул</th>
+                        <th>Размер</th>
+                        <th>Цвет</th>
+                        <th>Кол-во</th>
+                        <th>Цена закупки</th>
+                        <th>Сумма</th>
+                        <th>Поставщик</th>
+                        <th>Кладовщик</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    @foreach (var item in Model.DeliveryReport)
+                    {
+                        <tr>
+                            <td>@item.Date.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="bold">@item.ProductName</td>
+                            <td>@item.Article</td>
+                            <td>@item.Size</td>
+                            <td>@item.Color</td>
+                            <td>
+                                <span class="badge-qty">
+                                    @item.Amount
+                                </span>
+                            </td>
+                            <td class="price">
+                                @item.PurchasePrice.ToString("N2")
+                            </td>
+                            <td class="total">
+                                @item.TotalPrice.ToString("N2")
+                            </td>
+                            <td>@item.Provider</td>
+                            <td>@item.StorekeeperUsername</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (Model.DeliveryReport != null)
+    {
+        <div class="card">
+            <p>По выбранным фильтрам ничего не найдено</p>
+        </div>
+    }
+</div>
+
+<script>
+    const minRange = document.getElementById("minRange");
+    const maxRange = document.getElementById("maxRange");
+    const minInput = document.getElementById("minInput");
+    const maxInput = document.getElementById("maxInput");
+    const progress = document.getElementById("progress");
+
+    const maxValue = parseInt(maxRange.max);
+
+    function updateSlider() {
+        let minVal = parseInt(minRange.value);
+        let maxVal = parseInt(maxRange.value);
+
+        if (minVal > maxVal) {
+            [minVal, maxVal] = [maxVal, minVal];
+        }
+
+        minInput.value = minVal;
+        maxInput.value = maxVal;
+
+        const left = (minVal / maxValue) * 100;
+        const right = (maxVal / maxValue) * 100;
+
+        progress.style.left = left + "%";
+        progress.style.right = (100 - right) + "%";
+    }
+
+    function updateInputs() {
+        let minVal = parseInt(minInput.value) || 0;
+        let maxVal = parseInt(maxInput.value) || 0;
+
+        minRange.value = minVal;
+        maxRange.value = maxVal;
+
+        updateSlider();
+    }
+
+    minRange.addEventListener("input", updateSlider);
+    maxRange.addEventListener("input", updateSlider);
+    minInput.addEventListener("input", updateInputs);
+    maxInput.addEventListener("input", updateInputs);
+
+    function toggleProvidersDropdown() {
+        const list = document.getElementById("providersCheckboxList");
+        list.style.display = list.style.display === "block" ? "none" : "block";
+    }
+
+    function updateSelectedProvidersText() {
+        const checked = document.querySelectorAll('input[name="SelectedProviders"]:checked');
+
+        const text = Array.from(checked)
+            .map(x => x.getAttribute('data-display-name'))
+            .join(", ");
+
+        document.getElementById("selectedProvidersText").innerText =
+            text || "Все поставщики";
+    }
+
+    document.addEventListener("click", function (e) {
+        const container = document.querySelector(".custom-multiselect");
+        if (!container.contains(e.target)) {
+            document.getElementById("providersCheckboxList").style.display = "none";
+        }
+    });
+
+    window.onload = function () {
+        updateSlider();
+        updateSelectedProvidersText();
+    };
+</script>
