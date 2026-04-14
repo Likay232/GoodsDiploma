@@ -1,0 +1,257 @@
+@using GoodsApi.Infrastructure.Models.Enums
+@model GoodsApi.Infrastructure.ViewModels.RemainsReportViewModel
+
+@{
+    ViewBag.Title = "Отчет по остаткам";
+    Layout = "_Layout";
+
+    var statusDisplay = new Dictionary<RemainStatus, string>
+    {
+        { RemainStatus.Low, "Дефицит" },
+        { RemainStatus.Medium, "Норма" },
+        { RemainStatus.High, "Избыток" }
+    };
+}
+
+<style>
+    .report-page {
+        max-width: 1300px;
+        margin: 40px auto;
+        padding: 0 20px 40px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #1f2937;
+    }
+
+    .header {
+        margin-bottom: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header h2 {
+        margin: 0;
+        font-size: 34px;
+        font-weight: 700;
+    }
+
+    .header p {
+        margin-top: 10px;
+        font-size: 15px;
+        color: #6b7280;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 28px;
+        padding: 26px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        margin-top: 20px;
+    }
+
+    .form-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .input, .select {
+        border: 1px solid #d1d5db;
+        border-radius: 14px;
+        padding: 12px 14px;
+    }
+
+    .btn {
+        margin-top: 20px;
+        height: 46px;
+        padding: 0 22px;
+        background: #111827;
+        color: #fff;
+        border-radius: 14px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+    }
+
+    .report-table thead {
+        background: #f9fafb;
+    }
+
+    .report-table th {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #6b7280;
+        padding: 14px;
+        text-align: left;
+    }
+
+    .report-table td {
+        padding: 14px;
+        font-size: 14px;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .report-table tr:hover td {
+        background: #fafafa;
+    }
+
+    .badge {
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .badge-ok {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+    .badge-low {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-empty {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .badge-medium {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    @@media (max-width: 768px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="report-page">
+
+    <div class="header">
+        <h2>Отчет по остаткам</h2>
+        <p>Анализ текущих остатков товаров</p>
+    </div>
+
+    <!-- ФИЛЬТРЫ -->
+    <div class="card">
+        <div class="form-title">Фильтры</div>
+
+        <form method="post" asp-action="GetRemainsReport">
+
+            <div class="grid">
+
+                <div class="form-group">
+                    <label class="form-label">Категория</label>
+                    <select asp-for="Category" asp-items="Model.Categories" class="select">
+                        <option value="">Все категории</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Бренд</label>
+                    <select asp-for="Brand" asp-items="Model.Brands" class="select">
+                        <option value="">Все бренды</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Статус</label>
+                    <select asp-for="StatusFilter" asp-items="Model.Statuses" class="select">
+                        <option value="">Все статусы</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <button class="btn">Сформировать отчет</button>
+        </form>
+    </div>
+
+    <!-- РЕЗУЛЬТАТ -->
+    @if (Model.RemainReport != null && Model.RemainReport.Any())
+    {
+        <div class="card">
+            <div class="form-title">Результаты</div>
+
+            <div class="table-wrapper">
+                <table class="report-table">
+                    <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Артикул</th>
+                        <th>Размер</th>
+                        <th>Цвет</th>
+                        <th>Остаток</th>
+                        <th>Статус</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    @foreach (var item in Model.RemainReport)
+                    {
+                        string badgeClass = item.Status switch
+                        {
+                            RemainStatus.Low => "badge badge-empty",
+                            RemainStatus.Medium => "badge badge-medium",
+                            RemainStatus.High => "badge badge-ok",
+                            _ => "badge"
+                        };
+
+                        <tr>
+                            <td>@item.ProductName</td>
+                            <td>@item.Article</td>
+                            <td>@item.Size</td>
+                            <td>@item.Color</td>
+                            <td>@item.Amount</td>
+                            <td>
+                                <span class="@badgeClass">
+                                    @statusDisplay[item.Status]
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (Model.RemainReport != null)
+    {
+        <div class="card">
+            <p>По выбранным фильтрам ничего не найдено</p>
+        </div>
+    }
+
+</div>

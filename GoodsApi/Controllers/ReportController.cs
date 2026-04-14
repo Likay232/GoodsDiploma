@@ -63,4 +63,24 @@ public class ReportController(ReportService reportService) : Controller
 
         return View("DeliveriesReport", viewModel);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> RemainsReport()
+    {
+        var  viewModel = await reportService.GetRemainReportViewModel();
+        
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> GetRemainsReport(RemainsReportViewModel viewModel)
+    {
+        viewModel.Categories = await reportService.GetCategoriesSelectList();
+        viewModel.Brands = await reportService.GetBrandsSelectList();
+        viewModel.Statuses = await reportService.GetRemainStatusesSelectList();
+
+        viewModel.RemainReport = await reportService.GetRemainsReport(viewModel);
+
+        return View("RemainsReport", viewModel);
+    }
 }

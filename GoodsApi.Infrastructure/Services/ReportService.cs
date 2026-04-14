@@ -1,5 +1,6 @@
 using GoodsApi.Infrastructure.Models.Database;
 using GoodsApi.Infrastructure.Models.DTO;
+using GoodsApi.Infrastructure.Models.Enums;
 using GoodsApi.Infrastructure.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,40 @@ public class ReportService(DataComponent component, CatalogService catalogServic
             .ToList();
     }
 
+    public async Task<List<SelectListItem>> GetBrandsSelectList()
+    {
+        var products = await catalogService.GetProducts();
+
+        var brands = products
+            .GroupBy(pm => pm.Brand)
+            .Select(p => p.Key)
+            .ToList();
+
+        return brands.Select(c => new SelectListItem()
+            {
+                Value = c,
+                Text = c
+            })
+            .ToList();
+    }
+
+    public async Task<List<SelectListItem>> GetRemainStatusesSelectList()
+    {
+        return Enum.GetValues(typeof(RemainStatus))
+            .Cast<RemainStatus>()
+            .Select(x => new SelectListItem
+            {
+                Value = x.ToString(),
+                Text = x switch
+                {
+                    RemainStatus.Medium => "В норме",
+                    RemainStatus.Low => "Дефицит",
+                    RemainStatus.High => "Избыток",
+                    _ => x.ToString()
+                }
+            }).ToList();
+    }
+
     public async Task<List<SelectListItem>> GetProvidersSelectList()
     {
         var providers = (await catalogService.GetProviders())
@@ -57,6 +92,7 @@ public class ReportService(DataComponent component, CatalogService catalogServic
 
         return providers.ToList();
     }
+
 
     public async Task<List<ProductMotionReportEntry>> GetProductMovementsReport(
         ProductMovementReportViewModel viewModel)
@@ -140,7 +176,7 @@ public class ReportService(DataComponent component, CatalogService catalogServic
         var viewModel = new DeliveryReportViewModel();
 
         var t = component.SupplyOperations.ToList();
-        
+
         viewModel.Categories = await GetCategoriesSelectList();
         viewModel.Providers = await GetProvidersSelectList();
         viewModel.MaximumSupplyTotalPriceInDb = component.SupplyOperations.Max(s => s.Amount * s.PurchasePrice);
@@ -173,5 +209,45 @@ public class ReportService(DataComponent component, CatalogService catalogServic
             .ToList();
 
         return deliveriesList.Convert<Models.Storage.SupplyOperation, DeliveryReportEntry>();
+    }
+
+    public async Task<RemainsReportViewModel> GetRemainReportViewModel()
+    {
+        var viewModel = new RemainsReportViewModel();
+
+        viewModel.Categories = await GetCategoriesSelectList();
+        viewModel.Brands = await GetBrandsSelectList();
+        viewModel.Statuses = await GetRemainStatusesSelectList();
+
+        return viewModel;
+    }
+
+    public async Task<List<RemainsReportEntry>> GetRemainsReport(RemainsReportViewModel viewModel)
+    {
+        var remains = component.ProductInfos
+            .Include(product => product.Product).ToList();
+
+        if (viewModel.Category is not null)
+            remains = remains.Where(r => r.Product!.Category == viewModel.Category).ToList();
+
+        if (viewModel.Brand is not null)
+            remains = remains.Where(r => r.Product!.Brand == viewModel.Brand).ToList();
+
+        if (viewModel.StatusFilter is not null)
+        {
+            remains = remains.Where(r =>
+            {
+                var status =
+                    r.Amount <= r.Product!.MinimumRemain
+                        ? RemainStatus.Low
+                        : (r.Amount < 2 * r.Product.MinimumRemain
+                            ? RemainStatus.Medium
+                            : RemainStatus.High);
+
+                return status == viewModel.StatusFilter;
+            }).ToList();
+        }
+
+        return remains.Convert<Models.Storage.ProductInfo, RemainsReportEntry>();
     }
 }

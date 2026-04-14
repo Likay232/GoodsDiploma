@@ -97,6 +97,21 @@ public class ModelsMappingProfile : Profile
                 src.User != null 
                     ? src.User.Username 
                     : ""));
+        
+        CreateMap<Models.Storage.ProductInfo, Models.DTO.RemainsReportEntry>()
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => 
+                src.Product != null 
+                    ? src.Product.Name 
+                    : ""))
+            .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
+            .ForMember(dest => dest.Color, opt => opt.MapFrom(src => src.Color))
+            .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Size))
+            .ForMember(dest => dest.Article, opt => opt.MapFrom(src => src.Article))
+            .ForMember(dest => dest.MinimumRemain, opt => opt.MapFrom(src => 
+                src.Product != null 
+                    ? src.Product.MinimumRemain 
+                    : 0));
+
     }
 
     private string MapOperationType(string operationType)
