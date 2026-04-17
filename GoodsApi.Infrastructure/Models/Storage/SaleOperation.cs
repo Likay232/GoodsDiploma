@@ -16,6 +16,8 @@ public class SaleOperation : BaseEntity
     public decimal TotalPrice => Amount * PricePerUnit;
     
     public DateTime SaleDate { get; set; }
+
+    public string? PathToFile { get; set; } = string.Empty;
     
     public virtual ProductInfo? ProductInfo { get; set; }
     public virtual User? User { get; set; }

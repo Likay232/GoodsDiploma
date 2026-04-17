@@ -151,6 +151,43 @@ namespace GoodsApi.Infrastructure.Migrations
                     b.ToTable("product_information", (string)null);
                 });
 
+            modelBuilder.Entity("GoodsApi.Infrastructure.Models.Storage.ProductMovement", b =>
+                {
+                    b.Property<string>("Article")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CounterAgent")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("counteragent");
+
+                    b.Property<DateTime>("OperationDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("operationdate");
+
+                    b.Property<string>("OperationType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("operationtype");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("productname");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<decimal>("Size")
+                        .HasColumnType("numeric");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("product_movement_view", (string)null);
+                });
+
             modelBuilder.Entity("GoodsApi.Infrastructure.Models.Storage.Provider", b =>
                 {
                     b.Property<int>("Id")
@@ -270,6 +307,9 @@ namespace GoodsApi.Infrastructure.Migrations
 
                     b.Property<bool>("IsShipped")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("PathToFile")
+                        .HasColumnType("text");
 
                     b.Property<decimal>("PricePerUnit")
                         .HasColumnType("numeric");

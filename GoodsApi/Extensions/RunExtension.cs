@@ -5,6 +5,8 @@ using GoodsApi.AuthorizationRequirements.Handlers;
 using GoodsApi.Infrastructure.AutoMapperProfiles;
 using GoodsApi.Infrastructure.Models;
 using GoodsApi.Infrastructure.Models.Database;
+using GoodsApi.Infrastructure.Models.Enums;
+using GoodsApi.Infrastructure.Models.Strategies;
 using GoodsApi.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -115,6 +117,19 @@ public static class RunExtension
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<StorekeeperService>();
             builder.Services.AddScoped<ReportService>();
+
+            builder.Services.AddTransient<IDocumentGenerationStrategy, CheckGenerationStrategy>(sp =>
+            {
+                var contentRootPath = sp.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
+                return new CheckGenerationStrategy(contentRootPath);
+            });
+            
+            builder.Services.AddSingleton<DocumentGenerationService>(sp =>
+            {
+                var env = sp.GetRequiredService<IWebHostEnvironment>();
+                var strategies = sp.GetRequiredService<IEnumerable<IDocumentGenerationStrategy>>();
+                return new DocumentGenerationService(strategies, env.ContentRootPath);
+            });
             
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();

@@ -9,6 +9,7 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="16.1.1" />
       <PackageReference Include="EasyDox" Version="2.0.39" />
+      <PackageReference Include="EasyDox.Morpher" Version="2.0.30" />
       <PackageReference Include="EFCore.BulkExtensions" Version="10.0.1" />
       <PackageReference Include="EFCore.BulkExtensions.Core" Version="10.0.1" />
       <PackageReference Include="EFCore.BulkExtensions.PostgreSql" Version="10.0.1" />
@@ -27,6 +28,11 @@
       <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.1.7" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.7" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
+      <PackageReference Include="System.IO.Packaging" Version="10.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Templates\" />
     </ItemGroup>
 
 </Project>

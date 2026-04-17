@@ -38,4 +38,13 @@ public class ManagerController(ManagerService managerService) : Controller
         
         return RedirectToAction("ProductInfos", "Catalog", new {productId = model.ProductInfo.ProductId});
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetDocument(string filePath)
+    {
+        var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        var fileName = Path.GetFileName(filePath);
+
+        return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
+    }
 }

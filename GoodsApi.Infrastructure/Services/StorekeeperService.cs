@@ -1,6 +1,5 @@
 using GoodsApi.Infrastructure.Models.Database;
 using GoodsApi.Infrastructure.Models.DTO;
-using GoodsApi.Infrastructure.Models.Requests;
 using GoodsApi.Infrastructure.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
