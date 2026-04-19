@@ -8,4 +8,5 @@ public class Notification : BaseEntity
     public int NotificationType { get; set; }
     
     public bool IsRead { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -1,4 +1,5 @@
 using System.Globalization;
+using GoodsApi.Infrastructure.Models;
 using GoodsApi.Infrastructure.Models.Database;
 using GoodsApi.Infrastructure.Models.DTO;
 using GoodsApi.Infrastructure.Models.Enums;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GoodsApi.Infrastructure.Services;
 
-public class ManagerService(DataComponent component, CatalogService catalogService, DocumentGenerationService documentGenerationService)
+public class ManagerService(DataComponent component, CatalogService catalogService, DocumentGenerationService documentGenerationService, INotificationService notificationService)
 {
     public async Task<SaleRegistrationViewModel> GetSaleRegistrationViewModel(int productInfoId)
     {
@@ -41,18 +42,23 @@ public class ManagerService(DataComponent component, CatalogService catalogServi
         if (productInfo is null) return false;
         
         productInfo.Amount -= newSaleOperation.Amount;
+
+        if (productInfo.Amount < productInfo.Product?.MinimumRemain)
+            await notificationService.CreateAdminLowRemainsNotifications(productInfo.Article);
+        
         await component.Update(productInfo);
         
         await component.Insert(newSaleOperation);
 
-        var fieldValues = new List<string>();
-        
-        fieldValues.Add(newSaleOperation.Id.ToString());
-        fieldValues.Add(newSaleOperation.SaleDate.Date.ToString("yyyy-MM-dd"));
-        fieldValues.Add(productInfo.Product!.Name);
-        fieldValues.Add(productInfo.Amount.ToString());
-        fieldValues.Add(newSaleOperation.PricePerUnit.ToString(CultureInfo.InvariantCulture));
-        
+        var fieldValues = new List<string>
+        {
+            newSaleOperation.Id.ToString(),
+            newSaleOperation.SaleDate.Date.ToString("yyyy-MM-dd"),
+            productInfo.Product!.Name,
+            productInfo.Amount.ToString(),
+            newSaleOperation.PricePerUnit.ToString(CultureInfo.InvariantCulture)
+        };
+
         decimal totalPrice = newSaleOperation.TotalPrice;
         int rubles = (int)Math.Floor(totalPrice);
         int pennies = (int)((totalPrice - rubles) * 100);

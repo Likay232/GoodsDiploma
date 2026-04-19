@@ -62,6 +62,9 @@ namespace GoodsApi.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IsRead")
                         .HasColumnType("boolean");
 
@@ -489,7 +492,7 @@ namespace GoodsApi.Infrastructure.Migrations
             modelBuilder.Entity("GoodsApi.Infrastructure.Models.Storage.RefundOperation", b =>
                 {
                     b.HasOne("GoodsApi.Infrastructure.Models.Storage.SaleOperation", "SaleOperation")
-                        .WithMany()
+                        .WithMany("RefundOperations")
                         .HasForeignKey("SaleOperationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -592,6 +595,11 @@ namespace GoodsApi.Infrastructure.Migrations
             modelBuilder.Entity("GoodsApi.Infrastructure.Models.Storage.Product", b =>
                 {
                     b.Navigation("ProductInfos");
+                });
+
+            modelBuilder.Entity("GoodsApi.Infrastructure.Models.Storage.SaleOperation", b =>
+                {
+                    b.Navigation("RefundOperations");
                 });
 #pragma warning restore 612, 618
         }

@@ -8,6 +8,8 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="16.1.1" />
+      <PackageReference Include="ClosedXML" Version="0.105.0" />
+      <PackageReference Include="ClosedXML.Report" Version="0.2.12" />
       <PackageReference Include="EasyDox" Version="2.0.39" />
       <PackageReference Include="EasyDox.Morpher" Version="2.0.30" />
       <PackageReference Include="EFCore.BulkExtensions" Version="10.0.1" />

@@ -1,0 +1,278 @@
+@model List<GoodsApi.Infrastructure.Models.DTO.Notification>
+
+<style>
+    .notification-dropdown {
+        position: absolute;
+        right: 0;
+        top: 60px;
+        width: 340px;
+        max-height: 420px;
+        overflow-y: auto;
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+        padding: 12px;
+        z-index: 1000;
+    }
+
+    .notification-header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 12px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .notification-header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .notification-header-actions {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .count {
+        background: #111827;
+        color: #fff;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+    }
+
+    .notification-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .notification-item {
+        padding: 12px;
+        border-radius: 14px;
+        transition: 0.15s;
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+
+    .notification-item:hover {
+        background: #f9fafb;
+    }
+
+    .notification-item.unread {
+        background: #eff6ff;
+        border-color: #dbeafe;
+    }
+
+    .notification-item.read {
+        background: #f9fafb;
+        cursor: default;
+    }
+
+    /* Типы */
+    .notification-item.success {
+        border-left: 4px solid #10b981;
+    }
+
+    .notification-item.warning {
+        border-left: 4px solid #f59e0b;
+    }
+
+    .notification-item.error {
+        border-left: 4px solid #ef4444;
+    }
+
+    .notification-title {
+        font-weight: 700;
+        font-size: 14px;
+        color: #111827;
+
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .unread-dot {
+        width: 8px;
+        height: 8px;
+        background: #3b82f6;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .unread-dot.hidden {
+        display: none;
+    }
+
+    .notification-text {
+        font-size: 13px;
+        color: #374151;
+        margin-top: 4px;
+        line-height: 1.4;
+    }
+
+    .notification-meta {
+        margin-top: 6px;
+        font-size: 11px;
+        color: #6b7280;
+    }
+
+    .empty {
+        padding: 20px;
+        text-align: center;
+        color: #6b7280;
+    }
+
+    .mark-all-read {
+        margin-top: 5px;
+
+        background: none;
+        border: none;
+        padding: 0;
+
+        font-size: 13px;
+        font-weight: 600;
+        color: #111827;
+
+        text-decoration: underline;
+        text-underline-offset: 3px;
+
+        cursor: pointer;
+        transition: all 0.18s ease;
+    }
+
+    /* hover — легкий "реакт" */
+    .mark-all-read:hover {
+        color: #374151;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 5px;
+    }
+
+    /* клик */
+    .mark-all-read:active {
+        opacity: 0.6;
+    }
+
+    /* disabled */
+    .mark-all-read:disabled,
+    .mark-all-read.disabled {
+        color: #9ca3af;
+        cursor: not-allowed;
+        text-decoration: none;
+    }</style>
+
+<div class="notification-dropdown">
+    <div class="notification-header">
+
+        <div class="notification-header-top">
+            <span>Уведомления</span>
+            <span class="count">@Model.Count</span>
+        </div>
+
+        <div class="notification-header-actions">
+            <button id="markAllBtn"
+                    class="mark-all-read @(Model.All(x => x.IsRead) ? "disabled" : "")"
+                    @(Model.All(x => x.IsRead) ? "disabled" : "")>
+                Прочитать все
+            </button>
+        </div>
+
+    </div>
+    @if (Model.Any())
+    {
+        <div class="notification-list">
+            @foreach (var n in Model)
+            {
+                var typeClass = n.NotificationType switch
+                {
+                    GoodsApi.Infrastructure.Models.Enums.NotificationType.Success => "success",
+                    GoodsApi.Infrastructure.Models.Enums.NotificationType.Warning => "warning",
+                    GoodsApi.Infrastructure.Models.Enums.NotificationType.Error => "error",
+                    _ => ""
+                };
+
+                <div class="notification-item @typeClass @(n.IsRead ? "read" : "unread")" data-id="@n.Id">
+
+                    <div class="notification-title">
+                        <span class="unread-dot @(n.IsRead ? "hidden" : "")"></span>
+                        @n.Title
+                    </div>
+                    
+                    <div class="notification-text">
+                        @n.Message
+                    </div>
+
+                    <div class="notification-meta">
+                        <span class="date">
+                            @n.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                        </span>
+                    </div>
+
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty">
+            Нет уведомлений
+        </div>
+    }
+</div>
+
+<script>
+    document.querySelectorAll(".notification-item").forEach(item => {
+        item.addEventListener("click", async () => {
+            const id = item.dataset.id;
+
+            if (item.classList.contains("read")) return;
+
+            await fetch('/Notifications/MarkAsRead', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(id)
+            });
+
+            item.classList.remove("unread");
+            item.classList.add("read");
+
+            const dot = item.querySelector(".unread-dot");
+            if (dot) dot.classList.add("hidden");
+
+            updateMarkAllButtonState();
+        });
+    });
+
+    document.getElementById("markAllBtn")?.addEventListener("click", async () => {
+        await fetch('/Notifications/MarkAllAsRead', {
+            method: 'POST'
+        });
+
+        document.querySelectorAll(".notification-item")
+            .forEach(x => {
+                x.classList.remove("unread");
+                x.classList.add("read");
+            });
+    });
+
+    function updateMarkAllButtonState() {
+        const unreadExists = document.querySelector(".notification-item.unread");
+
+        const btn = document.getElementById("markAllBtn");
+        if (!btn) return;
+
+        if (!unreadExists) {
+            btn.classList.add("disabled");
+            btn.setAttribute("disabled", "disabled");
+        } else {
+            btn.classList.remove("disabled");
+            btn.removeAttribute("disabled");
+        }
+    }
+</script>

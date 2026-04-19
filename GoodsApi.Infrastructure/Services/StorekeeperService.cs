@@ -1,3 +1,4 @@
+using GoodsApi.Infrastructure.Models;
 using GoodsApi.Infrastructure.Models.Database;
 using GoodsApi.Infrastructure.Models.DTO;
 using GoodsApi.Infrastructure.ViewModels;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GoodsApi.Infrastructure.Services;
 
-public class StorekeeperService(DataComponent component, CatalogService catalogService)
+public class StorekeeperService(DataComponent component, CatalogService catalogService, INotificationService notificationService)
 {
     public async Task<bool> ConfirmShipmentForSaleOperation(int saleOperationId)
     {
@@ -25,11 +26,16 @@ public class StorekeeperService(DataComponent component, CatalogService catalogS
 
         var newWriteOffOperation = viewModel.Convert<WriteOffRegistrationViewModel, Models.Storage.WriteOffOperation>();
         var productInfo = viewModel.ProductInfo.Convert<ProductInfo, Models.Storage.ProductInfo>();
+        var product = await catalogService.GetProduct(productInfo.ProductId);
 
         var userId = int.Parse(userIdStr);
         newWriteOffOperation.UserId = userId;
 
         productInfo.Amount -= viewModel.Amount;
+
+        if (productInfo.Amount < product.MinimumRemain)
+            await notificationService.CreateAdminLowRemainsNotifications(productInfo.Article);
+        
         await component.Update(productInfo);
 
         return await component.Insert(newWriteOffOperation);

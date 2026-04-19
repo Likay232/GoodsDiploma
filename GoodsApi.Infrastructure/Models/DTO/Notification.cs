@@ -10,5 +10,6 @@ public class Notification
     public NotificationType NotificationType { get; set; }
     
     public bool IsRead { get; set; }
+    public DateTime CreatedAt { get; set; }
 
 }
