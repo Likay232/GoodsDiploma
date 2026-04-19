@@ -1,5 +1,6 @@
 using System.Globalization;
 using GoodsApi.Infrastructure.Models.Database;
+using GoodsApi.Infrastructure.Models.DTO;
 using GoodsApi.Infrastructure.Models.Enums;
 using GoodsApi.Infrastructure.Models.Requests;
 using GoodsApi.Infrastructure.ViewModels;
@@ -71,6 +72,97 @@ public class ManagerService(DataComponent component, CatalogService catalogServi
             newSaleOperation.PathToFile = fileName;
             await component.Update(newSaleOperation);
         }
+        
+        return true;
+    }
+
+    public async Task<SaleOperationsViewModel> GetSaleOperationsViewModel()
+    {
+        var sales = await component.SaleOperations
+            .Include(s => s.RefundOperations)
+            .Include(s => s.ProductInfo)
+            .Include(s => s.User)
+            .Where(s => s.ProductInfo != null && s.User != null)
+            .Select(s => new SaleOperation()
+            {
+                Id = s.Id,
+                ManagerName = s.User!.Username,
+                Amount = s.Amount,
+                PricePerUnit = s.PricePerUnit,
+                RefundedAmount = s.RefundOperations != null ? s.RefundOperations.Sum(r => r.Amount) : 0,
+                SaleDate = s.SaleDate,
+                PathToFile = s.PathToFile,
+                ProductInfo = new ProductInfo
+                {
+                    Id = s.ProductInfoId,
+                    ProductId = s.ProductInfo!.ProductId,
+                    Article = s.ProductInfo.Article,
+                    Price = s.ProductInfo.Price,
+                    Size = s.ProductInfo.Size,
+                    Color = s.ProductInfo.Color,
+                    Amount = s.ProductInfo.Amount,
+                    Location = s.ProductInfo.Location,
+                }
+            })
+            .ToListAsync();
+
+        var viewModel = new SaleOperationsViewModel()
+        {
+            SaleOperations = sales
+        };
+
+        return viewModel;
+    }
+    
+    public async Task<RefundViewModel> GetRefundViewModel(int saleOperationId)
+    {
+        var saleOperation = await component.SaleOperations
+            .FirstAsync(s => s.Id == saleOperationId);
+        
+        var refundedAmountForSaleOperation = component.RefundOperations
+            .Where(r => r.SaleOperationId == saleOperationId)
+            .Sum(r => r.Amount);
+
+        var viewModel = new RefundViewModel()
+        {
+            SaleOperationId = saleOperationId,
+            SoldAmount = saleOperation.Amount,
+            RefundedAmount = refundedAmountForSaleOperation,
+        };
+
+        return viewModel;
+    }
+    
+    public async Task<bool> RegisterRefundOperation(RefundViewModel viewModel, string userIdStr)
+    {
+        var userId = int.TryParse(userIdStr, out int result) ? result : 0;
+        
+        if (!component.Users.Any(u => u.Id == userId)) return false;
+        
+        var saleOperation = component.SaleOperations
+            .Include(s => s.ProductInfo)
+            .FirstOrDefault(s => s.Id == viewModel.SaleOperationId);
+        
+        if (saleOperation is null) return false;
+     
+        var refundedAmountForSaleOperation = component.RefundOperations
+            .Where(r => r.SaleOperationId == viewModel.SaleOperationId)
+            .Sum(r => r.Amount);
+
+        if (refundedAmountForSaleOperation + viewModel.Amount > saleOperation.Amount) return false;
+
+        var productInfo = (await catalogService.GetProductInfo(saleOperation.ProductInfoId))
+            .Convert<ProductInfo, Models.Storage.ProductInfo>();
+        
+        productInfo.Amount += viewModel.Amount;
+        
+        var refundOperation = viewModel
+            .Convert<RefundViewModel, Models.Storage.RefundOperation>();
+        refundOperation.UserId = userId;
+
+        var tasks = new List<Task> { component.Update(productInfo), component.Insert(refundOperation) };
+        
+        await Task.WhenAll(tasks);
         
         return true;
     }

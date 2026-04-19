@@ -1,0 +1,327 @@
+@model GoodsApi.Infrastructure.ViewModels.SaleOperationsViewModel
+
+@{
+    ViewBag.Title = "Операции продаж";
+    Layout = "_Layout";
+}
+
+<head>
+    <style>
+        .sales-page {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px 40px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .sales-header {
+            margin-bottom: 30px;
+        }
+
+        .sales-header h2 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .sales-header p {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .sales-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .sale-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 22px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: 0.18s;
+        }
+
+        .sale-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 36px rgba(0,0,0,0.06);
+        }
+
+        /* HEADER */
+
+        .sale-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .sale-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .sale-date {
+            font-size: 12px;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        /* PRODUCT META */
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .meta-badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #f9fafb;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* INFO GRID */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .info-block {
+            background: #f9fafb;
+            padding: 12px 14px;
+            border-radius: 16px;
+            border: 1px solid #f3f4f6;
+        }
+
+        .info-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #6b7280;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        /* TOTAL */
+
+        .total-block {
+            margin-top: 6px;
+            padding: 16px;
+            border-radius: 18px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 13px;
+            color: #047857;
+            font-weight: 700;
+        }
+
+        .total-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #047857;
+        }
+
+        /* ACTIONS */
+
+        .actions {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            height: 42px;
+            padding: 0 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.18s;
+        }
+
+        .btn-primary {
+            background: #111827;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.18s;
+        }
+
+        .icon-btn:hover {
+            background: #f9fafb;
+            transform: translateY(-2px);
+        }
+
+        .icon-btn img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .empty-state {
+            margin-top: 20px;
+            padding: 40px;
+            text-align: center;
+            border-radius: 24px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #6b7280;
+        }
+
+        @@media (max-width: 768px) {
+            .sales-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<div class="sales-page">
+
+    <div class="sales-header">
+        <h2>Операции продаж</h2>
+        <p>История всех продаж товаров и оформленных чеков</p>
+    </div>
+
+    @if (Model.SaleOperations != null && Model.SaleOperations.Any())
+    {
+        <div class="sales-grid">
+            @foreach (var sale in Model.SaleOperations)
+            {
+                <div class="sale-card">
+
+                    <!-- HEADER -->
+                    <div class="sale-top">
+                        <div class="sale-title">
+                            @sale.ProductInfo.Article
+                        </div>
+                        <div class="sale-date">
+                            @sale.SaleDate.ToString("dd.MM.yyyy HH:mm")
+                        </div>
+                    </div>
+
+                    <!-- META -->
+                    <div class="meta-row">
+                        <span class="meta-badge">Размер: @sale.ProductInfo.Size</span>
+                        <span class="meta-badge">Цвет: @sale.ProductInfo.Color</span>
+                    </div>
+
+                    <!-- INFO -->
+                    <div class="info-grid">
+                        <div class="info-block">
+                            <div class="info-label">Менеджер</div>
+                            <div class="info-value">@sale.ManagerName</div>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-label">Количество</div>
+                            <div class="info-value">@sale.Amount</div>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-label">Цена за единицу</div>
+                            <div class="info-value">@sale.PricePerUnit</div>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-label">Локация</div>
+                            <div class="info-value">@sale.ProductInfo.Location</div>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL -->
+                    <div class="total-block">
+                        <div class="total-label">Сумма продажи</div>
+                        <div class="total-value">@sale.TotalPrice</div>
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="actions">
+
+                        @if (!string.IsNullOrEmpty(sale.PathToFile))
+                        {
+                            <a asp-controller="Manager"
+                               asp-action="GetDocument"
+                               asp-route-filePath="@sale.PathToFile"
+                               class="btn btn-primary"
+                               title="Получить чек"
+                               download>
+                                Получить чек
+                            </a>
+                        }
+                        else
+                        {
+                            <div></div>
+                        }
+
+                        <!-- Возврат -->
+                        @if (sale.RefundedAmount < sale.Amount)
+                        {
+                            <a asp-controller="Manager"
+                               asp-action="RefundPage"
+                               asp-route-saleOperationId="@sale.Id"
+                               class="icon-btn"
+                               title="Оформить возврат">
+                                <img src="~/images/refund.png" alt="Возврат"/>
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            Продажи пока отсутствуют
+        </div>
+    }
+
+</div>

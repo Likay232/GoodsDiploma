@@ -47,4 +47,39 @@ public class ManagerController(ManagerService managerService) : Controller
 
         return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> SaleOperations()
+    {
+        var viewModel = await managerService.GetSaleOperationsViewModel();
+        return View(viewModel);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> RefundPage(int saleOperationId)
+    {
+        var viewModel = await managerService.GetRefundViewModel(saleOperationId);
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> RegisterRefund(RefundViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View("RefundPage", model);
+        }
+        
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;        
+
+        if (!await managerService.RegisterRefundOperation(model, userId))
+        {
+            ModelState.AddModelError("", "Количество товара на возврат превышает купленное количество. ");
+            
+            return View("RefundPage", model);
+        }
+
+        return RedirectToAction(nameof(SaleOperations));
+    }
+        
 }

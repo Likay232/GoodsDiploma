@@ -35,7 +35,7 @@ public class StorekeeperService(DataComponent component, CatalogService catalogS
         return await component.Insert(newWriteOffOperation);
     }
 
-    public async Task<SaleOperationsViewModel> GetSaleOperationsViewModel()
+    public async Task<ShipmentApprovalViewModel> GetSaleOperationsViewModel()
     {
         var shipmentsForApproval = component.SaleOperations
             .Include(operation => operation.ProductInfo)
@@ -54,7 +54,7 @@ public class StorekeeperService(DataComponent component, CatalogService catalogS
             })
             .ToList();
 
-        return new SaleOperationsViewModel
+        return new ShipmentApprovalViewModel
         {
             ShipmentsForApproval = shipmentsForApproval
         };

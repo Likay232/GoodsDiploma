@@ -4,5 +4,5 @@ namespace GoodsApi.Infrastructure.ViewModels;
 
 public class SaleOperationsViewModel
 {
-    public List<ShipmentForApproval> ShipmentsForApproval { get; set; } = [];
+    public List<SaleOperation> SaleOperations { get; set; }
 }

@@ -112,6 +112,9 @@ public class ModelsMappingProfile : Profile
                     ? src.Product.MinimumRemain 
                     : 0));
 
+        CreateMap<ViewModels.RefundViewModel, Models.Storage.RefundOperation>()
+            .ForMember(dest => dest.RefundDate, opt => opt.MapFrom(src => src.RefundDate.ToUniversalTime()));
+
     }
 
     private string MapOperationType(string operationType)

@@ -173,6 +173,16 @@
                         </a>
                     </li>
                 }
+                
+                @if (User.IsInRole("Manager"))
+                {
+                    <li>
+                        <a asp-controller="Manager" asp-action="SaleOperations">
+                            <img src="~/images/sales.png" alt="Продажи"/>
+                            <span class="tooltip">Продажи</span>
+                        </a>
+                    </li>
+                }
 
                 <li>
                     <a asp-controller="Catalog" asp-action="Products">
@@ -182,7 +192,7 @@
                 </li>
                 
                 <li>
-                    <a asp-controller="Report" asp-action="RemainsReport">
+                    <a asp-controller="Report" asp-action="Index">
                         <img src="~/images/reports.png" alt="Отчеты"/>
                         <span class="tooltip">Отчеты</span>
                     </a>

@@ -21,4 +21,5 @@ public class SaleOperation : BaseEntity
     
     public virtual ProductInfo? ProductInfo { get; set; }
     public virtual User? User { get; set; }
+    public virtual List<RefundOperation>? RefundOperations { get; set; }
 }

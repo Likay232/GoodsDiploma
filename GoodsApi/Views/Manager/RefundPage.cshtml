@@ -1,0 +1,258 @@
+@model GoodsApi.Infrastructure.ViewModels.RefundViewModel
+
+@{
+    ViewBag.Title = "Оформление возврата";
+    Layout = "_Layout";
+
+    var maxAmount = Model.SoldAmount - Model.RefundedAmount;
+    var defaultDate = Model.RefundDate == default ? DateTime.Now : Model.RefundDate;
+}
+
+<head>
+    <style>
+        .refund-page {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px 40px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .header {
+            margin-bottom: 28px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 28px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin-top: 10px;
+            color: #6b7280;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 28px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 14px 34px rgba(0,0,0,0.05);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .badge {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .warning {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            padding: 16px;
+            border-radius: 18px;
+            color: #9a3412;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .full { grid-column: 1 / -1; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .input, .textarea {
+            border: 1px solid #d1d5db;
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .validation {
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 20px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .summary-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #047857;
+        }
+
+        .actions {
+            margin-top: 26px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: #111827;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+        }
+
+        .secondary-btn {
+            background: #f3f4f6;
+            padding: 12px 20px;
+            border-radius: 14px;
+            text-decoration: none;
+            color: #111827;
+        }
+
+        @@media(max-width:768px){
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn-primary, .secondary-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<div class="refund-page">
+    <div class="header">
+        <h2>Оформление возврата</h2>
+        <p>Возврат товара по ранее совершенной продаже.</p>
+    </div>
+
+    <div class="card">
+        <div class="info-row">
+            <span class="badge">Продано: @Model.SoldAmount шт.</span>
+            <span class="badge">Ранее возвращено: @Model.RefundedAmount шт.</span>
+        </div>
+
+        <div class="warning">
+            Возврат не может превышать количество проданного товара.
+        </div>
+
+        <form asp-action="RegisterRefund" asp-controller="Manager" method="post">
+
+            <input asp-for="SaleOperationId" type="hidden"/>
+            <input asp-for="UserId" type="hidden"/>
+            <input asp-for="RefundedAmount" type="hidden"/>
+            <input asp-for="SoldAmount" type="hidden"/>
+
+            <div asp-validation-summary="ModelOnly" class="validation"></div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label class="label">Количество товаров на возврат</label>
+                    <input asp-for="Amount"
+                           type="number"
+                           min="1"
+                           max="@maxAmount"
+                           class="input"/>
+                    <span asp-validation-for="Amount" class="validation"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Дата возврата</label>
+                    <input asp-for="RefundDate"
+                           type="datetime-local"
+                           value="@defaultDate.ToString("yyyy-MM-ddTHH:mm")"
+                           class="input"/>
+                    <span asp-validation-for="RefundDate" class="validation"></span>
+                </div>
+
+                <div class="form-group full">
+                    <label class="label">Причина</label>
+                    <textarea asp-for="Description"
+                              class="textarea"
+                              placeholder="Причина возврата..."></textarea>
+                    <span asp-validation-for="Description" class="validation"></span>
+                </div>
+
+            </div>
+
+            <div class="summary">
+                <div>После возврата будет скорректирован остаток товара</div>
+                <div class="summary-value" id="preview">0</div>
+            </div>
+
+            <div class="actions">
+                <a asp-action="SaleOperations" class="secondary-btn">Назад</a>
+
+                <button type="submit" class="btn-primary">
+                    Оформить возврат
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial"/>
+
+    <script>
+        const amountInput = document.getElementById("Amount");
+        const preview = document.getElementById("preview");
+
+        function update() {
+            const val = parseInt(amountInput?.value || 0);
+            preview.textContent = val > 0 ? val + " шт." : "0";
+        }
+
+        amountInput?.addEventListener("input", update);
+        update();
+    </script>
+}
