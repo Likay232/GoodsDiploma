@@ -241,6 +241,22 @@
             font-size: 12px;
         }
 
+        .btn-secondary {
+            margin-top: 20px;
+            height: 46px;
+            padding: 0 22px;
+            background: #f3f4f6;
+            color: #111827;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
         @@media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -268,13 +284,19 @@
 
                 <div class="form-group">
                     <label class="form-label">С даты</label>
-                    <input asp-for="StartDate" type="datetime-local" class="input"/>
+                    <input asp-for="StartDate"
+                           type="datetime-local"
+                           value="@Model.StartDate.ToString("yyyy-MM-ddTHH:mm")"
+                           class="input"/>
                     <span asp-validation-for="StartDate" class="validation"></span>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">По дату</label>
-                    <input asp-for="EndDate" type="datetime-local" class="input"/>
+                    <input asp-for="EndDate"
+                           type="datetime-local"
+                           value="@Model.EndDate.ToString("yyyy-MM-ddTHH:mm")"
+                           class="input"/>
                     <span asp-validation-for="EndDate" class="validation"></span>
                 </div>
 
@@ -326,6 +348,13 @@
             </div>
 
             <button type="submit" class="btn">Сформировать отчет</button>
+            
+            @if (Model.ProductMotionReportEntries.Any())
+            {
+                <button type="button" class="btn btn-secondary" onclick="downloadExcel()">
+                    Получить Excel
+                </button>
+            }
         </form>
     </div>
 
@@ -388,6 +417,15 @@
     <partial name="_ValidationScriptsPartial"/>
 
     <script>
+        function downloadExcel() {
+            const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProductMotionReportEntries));
+
+            downloadExcelGeneric(
+                '/Report/GetProductMovementReportDoc',
+                data,
+                'movement_report.xlsx'
+            );
+        }
         function toggleDropdown() {
             const list = document.getElementById("checkboxList");
             list.style.display = list.style.display === "block" ? "none" : "block";

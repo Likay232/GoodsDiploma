@@ -1,9 +1,11 @@
+using GoodsApi.Infrastructure.Models.DTO;
 using GoodsApi.Infrastructure.Services;
 using GoodsApi.Infrastructure.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GoodsApi.Controllers;
 
+[Route("[controller]/[action]")]
 public class ReportController(ReportService reportService) : Controller
 {
     [HttpGet]
@@ -24,6 +26,9 @@ public class ReportController(ReportService reportService) : Controller
     public async Task<IActionResult> GetProductMovementsReport(ProductMovementReportViewModel viewModel)
     {
         await reportService.GetFiltersForProductMovementsReport(viewModel);
+        
+        if (!ModelState.IsValid) return View("ProductMovementsReport", viewModel);
+
         viewModel.ProductMotionReportEntries = await reportService.GetProductMovementsReport(viewModel);
         
         return View("ProductMovementsReport", viewModel);
@@ -42,6 +47,9 @@ public class ReportController(ReportService reportService) : Controller
     {
         viewModel.Categories = await reportService.GetCategoriesSelectList();
         viewModel.SaleReport = await reportService.GetSalesReport(viewModel);
+        
+        if (!ModelState.IsValid) return View("SalesReport", viewModel);
+
         viewModel.ChartData = await reportService.GetSalesReportChartData(viewModel);
         
         return View("SalesReport", viewModel);
@@ -57,9 +65,12 @@ public class ReportController(ReportService reportService) : Controller
     [HttpPost]
     public async Task<IActionResult> GetDeliveryReport(DeliveryReportViewModel viewModel)
     {
-        viewModel.DeliveryReport = await reportService.GetDeliveryReport(viewModel);
         viewModel.Categories = await reportService.GetCategoriesSelectList();
         viewModel.Providers = await reportService.GetProvidersSelectList();
+        
+        if (!ModelState.IsValid) return View("DeliveriesReport", viewModel);
+        
+        viewModel.DeliveryReport = await reportService.GetDeliveryReport(viewModel);
 
         return View("DeliveriesReport", viewModel);
     }
@@ -75,6 +86,8 @@ public class ReportController(ReportService reportService) : Controller
     [HttpPost]
     public async Task<IActionResult> GetRemainsReport(RemainsReportViewModel viewModel)
     {
+        if (!ModelState.IsValid) return View("RemainsReport", viewModel);
+        
         viewModel.Categories = await reportService.GetCategoriesSelectList();
         viewModel.Brands = await reportService.GetBrandsSelectList();
         viewModel.Statuses = await reportService.GetRemainStatusesSelectList();
@@ -83,4 +96,37 @@ public class ReportController(ReportService reportService) : Controller
 
         return View("RemainsReport", viewModel);
     }
+
+    [HttpPost]
+    public async Task<IActionResult> GetSalesReportDoc([FromBody] List<SalesReportEntry> data)
+    {
+        var file = await reportService.GetExcelFileForList(data);
+
+        return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    } 
+    
+    [HttpPost]
+    public async Task<IActionResult> GetRemainsReportDoc([FromBody] List<RemainsReportEntry> data)
+    {
+        var file = await reportService.GetExcelFileForList(data);
+
+        return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    } 
+
+    [HttpPost]
+    public async Task<IActionResult> GetProductMovementReportDoc([FromBody] List<ProductMotionReportEntry> data)
+    {
+        var file = await reportService.GetExcelFileForList(data);
+
+        return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    } 
+    
+    [HttpPost]
+    public async Task<IActionResult> GetDeliveriesReportDoc([FromBody] List<DeliveryReportEntry> data)
+    {
+        var file = await reportService.GetExcelFileForList(data);
+
+        return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    } 
+
 }

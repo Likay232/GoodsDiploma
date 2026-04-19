@@ -1,3 +1,5 @@
+using ClosedXML.Excel;
+using GoodsApi.Infrastructure.Extensions;
 using GoodsApi.Infrastructure.Models.Database;
 using GoodsApi.Infrastructure.Models.DTO;
 using GoodsApi.Infrastructure.Models.Enums;
@@ -249,5 +251,17 @@ public class ReportService(DataComponent component, CatalogService catalogServic
         }
 
         return remains.Convert<Models.Storage.ProductInfo, RemainsReportEntry>();
+    }
+
+    public async Task<byte[]> GetExcelFileForList<T>(List<T> list)
+    {
+        var table = list.ToDataTable("report");
+
+        using var wb = new XLWorkbook();
+        wb.Worksheets.Add(table).ColumnsUsed().AdjustToContents();
+
+        var stream = new MemoryStream();
+        wb.SaveAs(stream);
+        return stream.ToArray();
     }
 }

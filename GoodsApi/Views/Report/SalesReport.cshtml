@@ -221,6 +221,22 @@
         background: #f3f4f6;
     }
 
+    .btn-secondary {
+        margin-top: 20px;
+        height: 46px;
+        padding: 0 22px;
+        background: #f3f4f6;
+        color: #111827;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
+    }
+
     @@media (max-width: 768px) {
         .grid {
             grid-template-columns: 1fr;
@@ -292,6 +308,13 @@
             </div>
 
             <button class="btn">Сформировать отчет</button>
+            
+            @if (Model.SaleReport?.Any() == true)
+            {
+                <button type="button" class="btn btn-secondary" onclick="downloadExcel()">
+                    Получить Excel
+                </button>
+            }
         </form>
     </div>
 
@@ -364,6 +387,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    function downloadExcel() {
+        const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SaleReport));
+
+        downloadExcelGeneric(
+            '/Report/GetSalesReportDoc',
+            data,
+            'sales_report.xlsx'
+        );
+    }
+
     const chartData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
                           Model.ChartData?.Select(x => new
                           {

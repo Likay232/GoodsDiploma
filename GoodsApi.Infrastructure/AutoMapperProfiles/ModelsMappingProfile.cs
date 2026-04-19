@@ -1,4 +1,5 @@
 using AutoMapper;
+using GoodsApi.Infrastructure.Models.Enums;
 
 namespace GoodsApi.Infrastructure.AutoMapperProfiles;
 
@@ -125,6 +126,18 @@ public class ModelsMappingProfile : Profile
             "Sale" => "Продажа",
             "WriteOff" => "Списание",
             "Inventory" => "Инвентаризация",
+            "Refund" => "Возврат",
+            _ => "Неизвестно"
+        };
+    }
+    
+    private string MapRemainStatus(RemainStatus status)
+    {
+        return status switch
+        {
+            RemainStatus.Low => "Дефицит",
+            RemainStatus.Medium => "В норме",
+            RemainStatus.High => "Избыток",
             _ => "Неизвестно"
         };
     }
