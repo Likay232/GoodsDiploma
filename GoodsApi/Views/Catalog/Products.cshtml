@@ -438,7 +438,6 @@
                     <div class="product-top">
                         <div class="product-title-block">
                             <h3 class="product-name">@product.Name</h3>
-                            <span class="product-id">ID: @product.Id</span>
                         </div>
                     </div>
 
@@ -485,7 +484,7 @@
                                       asp-route-productId="@product.Id"
                                       method="post"
                                       class="delete-form"
-                                      onsubmit="return confirm('Удалить товар и связанные с ним реализации?');">
+                                      onsubmit="return confirm('Удалить товар и связанные с ним варианты?');">
                                     <button type="submit"
                                             class="icon-btn delete-btn"
                                             title="Удалить">

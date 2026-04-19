@@ -1,7 +1,7 @@
 @model GoodsApi.Infrastructure.ViewModels.ProductInfosViewModel
 
 @{
-ViewBag.Title = "Реализации товара";
+ViewBag.Title = "Варианты товара";
 Layout = "_Layout";
 }
 
@@ -461,7 +461,7 @@ Layout = "_Layout";
 <div class="product-infos-page">
     <div class="page-header">
         <div class="page-header-left">
-            <h2>Реализации товара</h2>
+            <h2>Вариант товара</h2>
             <p>Детальная информация по всем доступным вариантам выбранного товара.</p>
         </div>
 
@@ -479,7 +479,7 @@ Layout = "_Layout";
                   asp-route-productId="@Model.Product.Id"
                   class="add-btn">
                 <img src="~/images/add.svg" alt="Добавить" />
-                <span>Добавить реализацию</span>
+                <span>Добавить вариант</span>
             </a>
             }
         </div>
@@ -492,7 +492,6 @@ Layout = "_Layout";
                 <p>Основная карточка товара</p>
             </div>
 
-            <span class="product-id-badge">ID: @Model.Product.Id</span>
         </div>
 
         <div class="product-main-grid">
@@ -516,10 +515,10 @@ Layout = "_Layout";
     </div>
 
     <div class="infos-section-header">
-        <h3>Реализации</h3>
+        <h3>Варианты</h3>
 
         <div class="infos-count">
-            Всего реализаций: @Model.ProductInfos.Count
+            Всего вариантов: @Model.ProductInfos.Count
         </div>
     </div>
 
@@ -533,8 +532,6 @@ Layout = "_Layout";
                 <div class="article-block">
                     <h4 class="article-title">@info.Article</h4>
                 </div>
-
-                <span class="info-id-badge">ID: @info.Id</span>
             </div>
 
             <div class="info-card-grid">
@@ -586,7 +583,7 @@ Layout = "_Layout";
                       asp-route-productId="@Model.Product.Id"
                       method="post"
                       class="delete-form"
-                      onsubmit="return confirm('Удалить данную реализацию товара?');">
+                      onsubmit="return confirm('Удалить данный вариант товара?');">
                     <button type="submit"
                             class="icon-btn delete-btn"
                             title="Удалить">
@@ -640,9 +637,9 @@ Layout = "_Layout";
     else
     {
     <div class="empty-state">
-        <h3>Реализации пока отсутствуют</h3>
+        <h3>Варианты пока отсутствуют</h3>
         <p>
-            Для данного товара ещё не добавлено ни одной реализации.
+            Для данного товара ещё не добавлено ни одного варианта.
             После добавления они появятся здесь.
         </p>
     </div>

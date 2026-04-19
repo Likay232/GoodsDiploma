@@ -415,11 +415,9 @@
         <div class="info-card">
             <div class="product-info-top">
                 <div class="product-title-block">
-                    <h3 class="product-title">Реализация товара</h3>
+                    <h3 class="product-title">Вариант товара</h3>
 
                     <div class="product-subtitle">
-                        <span class="meta-badge">ID реализации: @Model.ProductInfo.Id</span>
-                        <span class="meta-badge">ID товара: @Model.ProductInfo.ProductId</span>
                         <span class="meta-badge">Артикул: @Model.ProductInfo.Article</span>
                     </div>
                 </div>
@@ -522,7 +520,7 @@
                 <div class="summary-box">
                     <div>
                         <div class="summary-title">Оценочная сумма списания</div>
-                        <div class="field-hint">Сумма рассчитывается как количество × цена реализации.</div>
+                        <div class="field-hint">Сумма рассчитывается как количество × цена товара.</div>
                     </div>
 
                     <div class="summary-value" id="writeOffTotalPreview">0</div>
@@ -533,7 +531,7 @@
                        asp-action="ProductInfos"
                        asp-route-productId="@Model.ProductInfo.ProductId"
                        class="secondary-btn">
-                        Назад к реализациям
+                        Назад
                     </a>
 
                     <button type="submit"

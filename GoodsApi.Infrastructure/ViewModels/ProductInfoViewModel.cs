@@ -46,8 +46,8 @@ public class ProductInfoEditViewModel
     public bool IsEdit => Id != 0;
 
     public string PageTitle => IsEdit
-        ? "Редактирование реализации товара"
-        : "Добавление реализации товара";
+        ? "Редактирование товара"
+        : "Добавление товара";
 
     public string SubmitButtonText => IsEdit
         ? "Сохранить"

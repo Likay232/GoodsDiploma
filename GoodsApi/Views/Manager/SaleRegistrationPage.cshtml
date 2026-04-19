@@ -374,7 +374,7 @@
 <div class="sale-page">
     <div class="sale-header">
         <h2>Регистрация продажи</h2>
-        <p>Оформите продажу конкретной реализации товара со склада.</p>
+        <p>Оформите продажу конкретного товара со склада.</p>
     </div>
 
     <div class="sale-layout">
@@ -398,8 +398,6 @@
                     <h3 class="product-title">@Model.Name</h3>
 
                     <div class="product-subtitle">
-                        <span class="meta-badge">ID варианта: @Model.ProductInfo!.Id</span>
-                        <span class="meta-badge">ID товара: @Model.ProductInfo.ProductId</span>
                         <span class="meta-badge">Артикул: @Model.ProductInfo.Article</span>
                     </div>
                 </div>
@@ -508,7 +506,7 @@
                        asp-action="ProductInfos"
                        asp-route-productId="@Model.ProductInfo.ProductId"
                        class="secondary-btn">
-                        Назад к реализациям
+                        Назад
                     </a>
 
                     <button type="submit"
