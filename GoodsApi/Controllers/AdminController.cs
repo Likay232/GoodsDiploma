@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GoodsApi.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin")]
 [Route("[controller]/[action]")]
 public class AdminController(AdminService adminService) : Controller
 {
@@ -14,7 +14,7 @@ public class AdminController(AdminService adminService) : Controller
     {
         return RedirectToAction(nameof(Users));
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> Users()
     {
@@ -25,10 +25,10 @@ public class AdminController(AdminService adminService) : Controller
     public async Task<IActionResult> UserEditPage(int id = 0)
     {
         var model = await adminService.GetUserViewModel(id);
-        
+
         return View(model);
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> DeleteUser(int userId)
     {
@@ -55,7 +55,7 @@ public class AdminController(AdminService adminService) : Controller
 
         return RedirectToAction(nameof(Users));
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> ChangeUserPasswordPage(int id)
     {
@@ -83,5 +83,4 @@ public class AdminController(AdminService adminService) : Controller
 
         return RedirectToAction(nameof(Users));
     }
-
 }

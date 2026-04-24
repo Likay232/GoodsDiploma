@@ -131,97 +131,84 @@
     <div class="reports-grid">
 
         <!-- Остатки -->
-        <div class="report-card">
-            <div class="report-title">Остатки товаров</div>
+        @if (User.IsInRole("Admin") || User.IsInRole("Storekeeper"))
+        {
+            <div class="report-card">
+                <div class="report-title">Остатки товаров</div>
 
-            <div class="report-description">
-                Текущее состояние склада с детализацией по характеристикам товара и контролем минимальных остатков.
+                <div class="report-description">
+                    Текущее состояние склада с детализацией по характеристикам товара и контролем минимальных остатков.
+                </div>
+
+                <div class="report-actions">
+                    <a asp-controller="Report"
+                       asp-action="RemainsReport"
+                       class="report-btn">
+                        Открыть отчет
+                    </a>
+                </div>
             </div>
-
-            @* <div class="report-meta"> *@
-            @*     <span class="meta-badge">Остаток</span> *@
-            @*     <span class="meta-badge">Дефицит</span> *@
-            @*     <span class="meta-badge">Избыток</span> *@
-            @* </div> *@
-
-            <div class="report-actions">
-                <a asp-controller="Report"
-                   asp-action="RemainsReport"
-                   class="report-btn">
-                    Открыть отчет
-                </a>
-            </div>
-        </div>
+        }
 
         <!-- Движение -->
-        <div class="report-card">
-            <div class="report-title">Движение товаров</div>
+        @if (User.IsInRole("Admin") || User.IsInRole("Storekeeper"))
+        {
+            <div class="report-card">
+                <div class="report-title">Движение товаров</div>
 
-            <div class="report-description">
-                Все операции: поступления, продажи, списания и перемещения за выбранный период.
+                <div class="report-description">
+                    Все операции: поступления, продажи, списания и перемещения за выбранный период.
+                </div>
+
+                <div class="report-actions">
+                    <a asp-controller="Report"
+                       asp-action="ProductMovementsReport"
+                       class="report-btn">
+                        Открыть отчет
+                    </a>
+                </div>
             </div>
-
-            @* <div class="report-meta"> *@
-            @*     <span class="meta-badge">Приход</span> *@
-            @*     <span class="meta-badge">Расход</span> *@
-            @*     <span class="meta-badge">Списание</span> *@
-            @* </div> *@
-
-            <div class="report-actions">
-                <a asp-controller="Report"
-                   asp-action="ProductMovementsReport"
-                   class="report-btn">
-                    Открыть отчет
-                </a>
-            </div>
-        </div>
+        }
 
         <!-- Продажи -->
-        <div class="report-card">
-            <div class="report-title">Продажи</div>
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <div class="report-card">
+                <div class="report-title">Продажи</div>
 
-            <div class="report-description">
-                Анализ реализованных товаров, выручки и эффективности продаж с визуализацией данных.
+                <div class="report-description">
+                    Анализ реализованных товаров, выручки и эффективности продаж с визуализацией данных.
+                </div>
+
+                <div class="report-actions">
+                    <a asp-controller="Report"
+                       asp-action="SalesReport"
+                       class="report-btn">
+                        Открыть отчет
+                    </a>
+                </div>
             </div>
-
-            @* <div class="report-meta"> *@
-            @*     <span class="meta-badge">Выручка</span> *@
-            @*     <span class="meta-badge">Менеджеры</span> *@
-            @*     <span class="meta-badge">Диаграммы</span> *@
-            @* </div> *@
-
-            <div class="report-actions">
-                <a asp-controller="Report"
-                   asp-action="SalesReport"
-                   class="report-btn">
-                    Открыть отчет
-                </a>
-            </div>
-        </div>
+        }
 
         <!-- Поставки -->
-        <div class="report-card">
-            <div class="report-title">Поставки товаров</div>
+        @if (User.IsInRole("Admin") || User.IsInRole("Storekeeper"))
+        {
+            <div class="report-card">
+                <div class="report-title">Поставки товаров</div>
 
-            <div class="report-description">
-                Учет поступлений от поставщиков с анализом объемов закупок и стоимости.
+                <div class="report-description">
+                    Учет поступлений от поставщиков с анализом объемов закупок и стоимости.
+                </div>
+
+                <div class="report-actions">
+                    <a asp-controller="Report"
+                       asp-action="DeliveriesReport"
+                       class="report-btn">
+                        Открыть отчет
+                    </a>
+                </div>
             </div>
-
-            @* <div class="report-meta"> *@
-            @*     <span class="meta-badge">Поставщики</span> *@
-            @*     <span class="meta-badge">Закупки</span> *@
-            @*     <span class="meta-badge">Суммы</span> *@
-            @* </div> *@
-
-            <div class="report-actions">
-                <a asp-controller="Report"
-                   asp-action="DeliveriesReport"
-                   class="report-btn">
-                    Открыть отчет
-                </a>
-            </div>
-        </div>
-
+        }
     </div>
 
 </div>

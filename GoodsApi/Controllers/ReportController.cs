@@ -1,6 +1,7 @@
 using GoodsApi.Infrastructure.Models.DTO;
 using GoodsApi.Infrastructure.Services;
 using GoodsApi.Infrastructure.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GoodsApi.Controllers;
@@ -15,6 +16,7 @@ public class ReportController(ReportService reportService) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> ProductMovementsReport()
     {
         var viewModel = await reportService.GetProductMovementViewModel();
@@ -23,6 +25,7 @@ public class ReportController(ReportService reportService) : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> GetProductMovementsReport(ProductMovementReportViewModel viewModel)
     {
         await reportService.GetFiltersForProductMovementsReport(viewModel);
@@ -35,6 +38,7 @@ public class ReportController(ReportService reportService) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Manager,Admin")]
     public async Task<IActionResult> SalesReport()
     {
         var viewModel = await reportService.GetSalesReportViewModel();
@@ -43,6 +47,7 @@ public class ReportController(ReportService reportService) : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Manager,Admin")]
     public async Task<IActionResult> GetSalesReport(SalesReportViewModel viewModel)
     {
         viewModel.Categories = await reportService.GetCategoriesSelectList();
@@ -56,6 +61,7 @@ public class ReportController(ReportService reportService) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> DeliveriesReport()
     {
         var viewModel = await reportService.GetDeliveryReportViewModel();
@@ -63,6 +69,7 @@ public class ReportController(ReportService reportService) : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> GetDeliveryReport(DeliveryReportViewModel viewModel)
     {
         viewModel.Categories = await reportService.GetCategoriesSelectList();
@@ -76,6 +83,7 @@ public class ReportController(ReportService reportService) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> RemainsReport()
     {
         var  viewModel = await reportService.GetRemainReportViewModel();
@@ -84,6 +92,7 @@ public class ReportController(ReportService reportService) : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> GetRemainsReport(RemainsReportViewModel viewModel)
     {
         if (!ModelState.IsValid) return View("RemainsReport", viewModel);
@@ -98,6 +107,7 @@ public class ReportController(ReportService reportService) : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Manager,Admin")]
     public async Task<IActionResult> GetSalesReportDoc([FromBody] List<SalesReportEntry> data)
     {
         var file = await reportService.GetExcelFileForList(data);
@@ -106,6 +116,7 @@ public class ReportController(ReportService reportService) : Controller
     } 
     
     [HttpPost]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> GetRemainsReportDoc([FromBody] List<RemainsReportEntry> data)
     {
         var file = await reportService.GetExcelFileForList(data);
@@ -114,6 +125,7 @@ public class ReportController(ReportService reportService) : Controller
     } 
 
     [HttpPost]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> GetProductMovementReportDoc([FromBody] List<ProductMotionReportEntry> data)
     {
         var file = await reportService.GetExcelFileForList(data);
@@ -122,6 +134,7 @@ public class ReportController(ReportService reportService) : Controller
     } 
     
     [HttpPost]
+    [Authorize(Roles = "Storekeeper,Admin")]
     public async Task<IActionResult> GetDeliveriesReportDoc([FromBody] List<DeliveryReportEntry> data)
     {
         var file = await reportService.GetExcelFileForList(data);

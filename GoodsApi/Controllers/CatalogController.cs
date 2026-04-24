@@ -40,6 +40,7 @@ public class CatalogController(CatalogService service) : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteProduct(int productId)
     {
         await service.DeleteProduct(productId);
