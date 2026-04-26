@@ -115,6 +115,9 @@ public class ManagerService(DataComponent component, CatalogService catalogServi
         var viewModel = new SaleOperationsViewModel()
         {
             SaleOperations = sales
+                .Where(so => so.Amount > so.RefundedAmount || (!string.IsNullOrEmpty(so.PathToFile) && File.Exists(so.PathToFile)))
+                .ToList()
+
         };
 
         return viewModel;

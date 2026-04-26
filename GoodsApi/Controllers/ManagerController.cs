@@ -42,6 +42,8 @@ public class ManagerController(ManagerService managerService) : Controller
     [HttpGet]
     public async Task<IActionResult> GetDocument(string filePath)
     {
+        if (!Path.Exists(filePath)) return StatusCode(404);
+        
         var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         var fileName = Path.GetFileName(filePath);
 

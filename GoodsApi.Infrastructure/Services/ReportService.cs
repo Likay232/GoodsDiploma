@@ -150,14 +150,42 @@ public class ReportService(DataComponent component, CatalogService catalogServic
             salesQuery = salesQuery.Where(saleOperation => saleOperation.ProductInfo!.Product!.Name == viewModel.Name);
 
         var salesList = salesQuery.ToList();
+        
+        var refunds = component.RefundOperations
+            .Where(s =>
+                s.RefundDate >= viewModel.StartDate.ToUniversalTime() &&
+                s.RefundDate <= viewModel.EndDate.ToUniversalTime())
+            .GroupBy(r => r.SaleOperationId)
+            .Select(g => new
+            {
+                SaleId = g.Key,
+                TotalRefunded = g.Sum(x => x.Amount)
+            })
+            .ToDictionary(x => x.SaleId, x => x.TotalRefunded);
 
-        salesList = salesList
+        var filteredSales = new List<Models.Storage.SaleOperation>();
+
+        foreach (var sale in salesList)
+        {
+            refunds.TryGetValue(sale.Id, out var refundedQty);
+
+            var finalQty = sale.Amount - refundedQty;
+
+            if (finalQty <= 0)
+                continue;
+
+            sale.Amount = finalQty;
+            
+            filteredSales.Add(sale);
+        }
+        
+        filteredSales = filteredSales
             .Where(sale => sale.TotalPrice >= viewModel.MinimumTotalPrice &&
                            sale.TotalPrice <= viewModel.MaximumTotalPrice)
             .ToList();
-
-        var salesReport = salesList.Convert<Models.Storage.SaleOperation, SalesReportEntry>();
-
+        
+        var salesReport = filteredSales.Convert<Models.Storage.SaleOperation, SalesReportEntry>();
+        
         return salesReport;
     }
 

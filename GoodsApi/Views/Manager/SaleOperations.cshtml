@@ -267,6 +267,11 @@
                             <div class="info-label">Цена за единицу</div>
                             <div class="info-value">@sale.PricePerUnit</div>
                         </div>
+                        
+                        <div class="info-block">
+                            <div class="info-label">Ранее возвращено</div>
+                            <div class="info-value">@sale.RefundedAmount</div>
+                        </div>
 
                         <div class="info-block">
                             <div class="info-label">Локация</div>
@@ -283,7 +288,7 @@
                     <!-- ACTIONS -->
                     <div class="actions">
 
-                        @if (!string.IsNullOrEmpty(sale.PathToFile))
+                        @if (!string.IsNullOrEmpty(sale.PathToFile) && File.Exists(sale.PathToFile))
                         {
                             <a asp-controller="Manager"
                                asp-action="GetDocument"
