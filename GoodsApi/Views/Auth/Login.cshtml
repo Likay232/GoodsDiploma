@@ -75,6 +75,28 @@
         .links a:hover {
             color: #0056b3;
         }
+
+        .custom-error-summary {
+            text-align: center;
+            margin-top: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: red;
+            font-family: inherit;
+        }
+
+        .custom-error-summary ul {
+            margin: 0;
+            padding-left: 0;
+            list-style: none; /* убираем точку */
+        }
+
+        .custom-error-summary span,
+        .custom-error-summary > div {
+            display: block;
+        }
+
     </style>
 </head>
 <body>
@@ -82,14 +104,15 @@
         <h2>Вход в аккаунт</h2>
         <form method="post" asp-action="Login" asp-controller="Auth">
             <label name="Username">Логин</label>
-            <input name="Username" id="Username" placeholder="Введите логин" required />
+            <input name="Username" id="Username" placeholder="Введите логин" required value="@Model.Username" />
             
             <label name="Password">Пароль</label>
-            <input name="Password" type="password" id="Password" placeholder="Введите пароль" required />
+            <input name="Password" type="password" id="Password" placeholder="Введите пароль" required/>
             <span asp-validation-for="Password" class="text-danger"></span>
             
             <button type="submit">Войти</button>
         </form>
+        <div asp-validation-summary="ModelOnly" class="custom-error-summary"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>

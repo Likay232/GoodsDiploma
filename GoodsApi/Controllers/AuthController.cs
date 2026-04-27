@@ -44,6 +44,7 @@ public class AuthController(AuthService service) : Controller
 
             if (string.IsNullOrEmpty(token))
             {
+                ModelState.AddModelError("", "Неверное имя пользователя или пароль.");
                 return View(request);
             }
 
