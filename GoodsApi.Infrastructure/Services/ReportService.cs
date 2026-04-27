@@ -122,7 +122,7 @@ public class ReportService(DataComponent component, CatalogService catalogServic
 
         var sales = component.SaleOperations.ToList();
 
-        var maximumTotalPrice = sales.Max(operation => operation.PricePerUnit * operation.Amount);
+        var maximumTotalPrice = sales.Count > 0 ? sales.Max(operation => operation.PricePerUnit * operation.Amount) : 0;
 
         viewModel.Categories = await GetCategoriesSelectList();
 
@@ -205,11 +205,9 @@ public class ReportService(DataComponent component, CatalogService catalogServic
     {
         var viewModel = new DeliveryReportViewModel();
 
-        var t = component.SupplyOperations.ToList();
-
         viewModel.Categories = await GetCategoriesSelectList();
         viewModel.Providers = await GetProvidersSelectList();
-        viewModel.MaximumSupplyTotalPriceInDb = component.SupplyOperations.Max(s => s.Amount * s.PurchasePrice);
+        viewModel.MaximumSupplyTotalPriceInDb = component.SupplyOperations.Any() ? component.SupplyOperations.Max(s => s.Amount * s.PurchasePrice) : 0;
         viewModel.MaximumSupplyTotalPrice = viewModel.MaximumSupplyTotalPriceInDb;
         return viewModel;
     }
