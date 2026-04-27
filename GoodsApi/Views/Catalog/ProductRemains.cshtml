@@ -411,11 +411,10 @@
                         </div>
 
                         <div class="progress-track">
-                            <div class="segment-red" style="width: @redWidth%;"></div>
-                            <div class="segment-yellow" style="width: @yellowWidth%;"></div>
-                            <div class="segment-green" style="width: @greenWidth%;"></div>
-
-                            <div class="progress-marker" style="left: @markerPosition%;"></div>
+                            <div class="segment-red" style="width: @redWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                            <div class="segment-yellow" style="width: @yellowWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                            <div class="segment-green" style="width: @greenWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                            <div class="progress-marker" style="left: @markerPosition.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></div>
                         </div>
 
                         <div class="progress-scale">
