@@ -55,7 +55,7 @@ public class ManagerService(DataComponent component, CatalogService catalogServi
             newSaleOperation.Id.ToString(),
             newSaleOperation.SaleDate.Date.ToString("yyyy-MM-dd"),
             productInfo.Product!.Name,
-            productInfo.Amount.ToString(),
+            newSaleOperation.Amount.ToString(),
             newSaleOperation.PricePerUnit.ToString(CultureInfo.InvariantCulture)
         };
 
