@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using GoodsApi.Infrastructure.CustomAttributes;
 
 namespace GoodsApi.Infrastructure.ViewModels;
 
@@ -15,11 +16,7 @@ public class ProviderEditViewModel
     public string ContactFullName { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Введите номер телефона.")]
-    [RegularExpression(
-        @"^\+?[0-9\s\-\(\)]{7,20}$",
-        ErrorMessage = "Введите корректный номер телефона."
-    )]
-    [StringLength(50, ErrorMessage = "Телефон не должен превышать 50 символов.")]
+    [PhoneNumber]
     public string PhoneNumber { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Введите адрес электронной почты.")]
