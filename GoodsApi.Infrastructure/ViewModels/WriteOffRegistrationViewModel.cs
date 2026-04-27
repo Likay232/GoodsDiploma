@@ -3,7 +3,7 @@ using GoodsApi.Infrastructure.Models.DTO;
 
 namespace GoodsApi.Infrastructure.ViewModels;
 
-public class WriteOffRegistrationViewModel
+public class WriteOffRegistrationViewModel : IValidatableObject
 {
     public ProductInfo ProductInfo { get; set; } = new ();
     
@@ -17,4 +17,17 @@ public class WriteOffRegistrationViewModel
     public string Description { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Укажите дату списания.")]
-    public DateTime WriteOffDate { get; set; }}
+    public DateTime WriteOffDate { get; set; }
+    
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (WriteOffDate > DateTime.Now)
+        {
+            yield return new ValidationResult(
+                "Дата не может быть в будущем",
+                [nameof(WriteOffDate)]);
+        }
+    }
+}
+    
+    

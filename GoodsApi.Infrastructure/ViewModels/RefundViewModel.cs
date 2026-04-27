@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GoodsApi.Infrastructure.ViewModels;
 
-public class RefundViewModel
+public class RefundViewModel : IValidatableObject
 {
     [Required]
     public int SaleOperationId { get; set; }
@@ -35,5 +35,13 @@ public class RefundViewModel
                 "Количество возвращаемого товара превышает количество купленного",
                 [nameof(Amount)]);
         }
+        
+        if (RefundDate > DateTime.Now)
+        {
+            yield return new ValidationResult(
+                "Дата не может быть в будущем",
+                [nameof(RefundDate)]);
+        }
+
     }
 }

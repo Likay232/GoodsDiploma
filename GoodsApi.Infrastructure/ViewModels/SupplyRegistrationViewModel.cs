@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GoodsApi.Infrastructure.ViewModels;
 
-public class SupplyRegistrationViewModel
+public class SupplyRegistrationViewModel : IValidatableObject
 {
     public List<SelectListItem> Providers { get; set; } = new();
 
@@ -29,4 +29,14 @@ public class SupplyRegistrationViewModel
     [Display(Name = "Дата поставки")]
     [Required(ErrorMessage = "Укажите дату")]
     public DateTime AcceptanceDate { get; set; }
+    
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (AcceptanceDate > DateTime.Now)
+        {
+            yield return new ValidationResult(
+                "Дата не может быть в будущем",
+                [nameof(AcceptanceDate)]);
+        }
+    }
 }
