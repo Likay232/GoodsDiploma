@@ -24,15 +24,15 @@ public class ManagerService(DataComponent component, CatalogService catalogServi
 
         return viewModel;
     }
-    
+
     public async Task<bool> RegisterSale(SaleRegistrationViewModel viewModel, string? userIdStr)
     {
         if (userIdStr is null) return false;
 
         var request = viewModel.Convert<SaleRegistrationViewModel, RegisterSale>();
         var newSaleOperation = request.Convert<RegisterSale, Models.Storage.SaleOperation>();
-        
-        var userId =  int.Parse(userIdStr);
+
+        var userId = int.Parse(userIdStr);
         newSaleOperation.UserId = userId;
 
         var productInfo = component.ProductInfos
@@ -40,38 +40,35 @@ public class ManagerService(DataComponent component, CatalogService catalogServi
             .FirstOrDefault(pi => pi.Id == viewModel.ProductInfo.Id);
 
         if (productInfo is null) return false;
-        
+
         productInfo.Amount -= newSaleOperation.Amount;
 
         if (productInfo.Amount < productInfo.Product?.MinimumRemain)
             await notificationService.CreateAdminLowRemainsNotifications(productInfo.Article);
-        
-        await component.Update(productInfo);
-        
-        await component.Insert(newSaleOperation);
 
-        var fieldValues = new List<string>
-        {
-            newSaleOperation.Id.ToString(),
-            newSaleOperation.SaleDate.Date.ToString("yyyy-MM-dd"),
-            productInfo.Product!.Name,
-            newSaleOperation.Amount.ToString(),
-            newSaleOperation.PricePerUnit.ToString(CultureInfo.InvariantCulture)
-        };
+        await component.Update(productInfo);
+
+        await component.Insert(newSaleOperation);
 
         decimal totalPrice = newSaleOperation.TotalPrice;
         int rubles = (int)Math.Floor(totalPrice);
         int pennies = (int)((totalPrice - rubles) * 100);
-        
-        fieldValues.Add(newSaleOperation.TotalPrice.ToString(CultureInfo.InvariantCulture));
-        fieldValues.Add(rubles.ToString(CultureInfo.InvariantCulture));
-        fieldValues.Add(pennies.ToString(CultureInfo.InvariantCulture));
-
         var userName = component.Users.First(u => u.Id == userId).Username;
-        
-        fieldValues.Add(userName);
 
-        var fileName = await documentGenerationService.GenerateDoc(DocumentType.Check, fieldValues);
+        var fieldDictionary = new Dictionary<string, string>()
+        {
+            { "check-", newSaleOperation.Id.ToString() },
+            { "date", newSaleOperation.SaleDate.Date.ToString("yyyy-MM-dd") },
+            { "product-name", productInfo.Product!.Name },
+            { "amount", request.Amount.ToString() },
+            { "price-for-unit", newSaleOperation.PricePerUnit.ToString(CultureInfo.InvariantCulture) },
+            { "total-sum", totalPrice.ToString(CultureInfo.InvariantCulture) },
+            { "rubles", rubles.ToString(CultureInfo.InvariantCulture) },
+            { "pennies", pennies.ToString(CultureInfo.InvariantCulture) },
+            { "manager-name", userName },
+        };
+
+        var fileName = await documentGenerationService.GenerateDoc(DocumentType.Check, fieldDictionary);
 
         if (!string.IsNullOrWhiteSpace(fileName))
         {

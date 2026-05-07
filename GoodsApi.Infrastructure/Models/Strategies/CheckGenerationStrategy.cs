@@ -23,19 +23,10 @@ public class CheckGenerationStrategy(string rootPath) : IDocumentGenerationStrat
             { "manager-name", "" },
         };
 
-    public bool Generate(List<string> fieldValues, string outputPath)
+    public bool Generate(Dictionary<string, string> fieldValues, string outputPath)
     {
-        if (fieldValues.Count != FieldValues.Count)
-            return false;
-
-        var keys = FieldValues.Keys.ToList();
-        for (int i = 0; i < fieldValues.Count; i++)
-        {
-            FieldValues[keys[i]] = fieldValues[i];
-        }
-        
         var engine = new Engine();
-        var errors = engine.Merge(TemplatePath, FieldValues, outputPath);
+        var errors = engine.Merge(TemplatePath, fieldValues, outputPath);
 
         foreach (var error in errors)
         {

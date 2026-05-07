@@ -7,7 +7,7 @@ public class DocumentGenerationService(IEnumerable<IDocumentGenerationStrategy> 
 {
     private Dictionary<DocumentType, IDocumentGenerationStrategy> Strategies => strategies.ToDictionary(s => s.DocumentType, s => s);
     
-    public async Task<string?> GenerateDoc(DocumentType documentType, List<string> fieldValues)
+    public async Task<string?> GenerateDoc(DocumentType documentType, Dictionary<string, string> fieldValues)
     {
         if (!Strategies.TryGetValue(documentType, out var strategy))
             return null;
